@@ -177,7 +177,7 @@ all languages.
 
 ## Release Notes
 
-### Release 1.0.0 (December 15, 2014)
+### Release 1.0.0 (December 30, 2014)
 * **aws-kclrb** gem which exposes an interface to allow implementation of record processors in Ruby
   using the Amazon KCL's [MultiLangDaemon][multi-lang-daemon]
 * **samples** directory contains a sample producer and processing applications using the Amazon KCL
