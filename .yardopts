@@ -1,0 +1,6 @@
+--title 'Amazon Kinesis Client Library for Ruby'
+--markup markdown
+--markup-provider redcarpet
+--hide-api private
+lib/**/*.rb - README.md LICENSE.txt NOTICE.txt
+

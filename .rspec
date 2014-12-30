@@ -1,0 +1,4 @@
+--color
+--format progress
+-r spec_helper
+-I./lib
