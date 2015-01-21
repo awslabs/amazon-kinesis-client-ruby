@@ -114,7 +114,7 @@ if __FILE__ == $0
       stream_name = s
     end
     opts.on("-r REGION_NAME", "--region REGION_NAME", "AWS region name (see http://tinyurl.com/cc9cap7). (Default: SDK default)") do |r|
-      region = r
+      aws_region = r
     end
     opts.on("-p SLEEP_SECONDS", "--sleep SLEEP_SECONDS", Float, "How long to sleep betweep puts (seconds, can be fractional). (Default #{sleep_between_puts})") do |s|
       sleep_between_puts = s.to_f
@@ -147,4 +147,3 @@ if __FILE__ == $0
   producer = SampleProducer.new(kinesis, stream_name, sleep_between_puts, shard_count)
   producer.run(timeout)
 end
-
