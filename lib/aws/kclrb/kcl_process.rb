@@ -1,26 +1,26 @@
 #
 #  Copyright 2014 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# 
+#
 #  Licensed under the Amazon Software License (the "License").
 #  You may not use this file except in compliance with the License.
 #  A copy of the License is located at
-# 
+#
 #  http://aws.amazon.com/asl/
-# 
+#
 #  or in the "license" file accompanying this file. This file is distributed
 #  on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
 #  express or implied. See the License for the specific language governing
 #  permissions and limitations under the License.
 
-require 'aws/kclrb/io_proxy'
-require 'aws/kclrb/checkpointer'
+require_relative 'io_proxy'
+require_relative 'checkpointer'
 
 module Aws
   module KCLrb
     # Error raised if the {KCLProcess} received an input action that it
     # could not parse or it could not handle.
     class MalformedAction < RuntimeError; end
-  
+
     # Entry point for a KCL application in Ruby.
     #
     # Implementers of KCL applications in Ruby should instantiate this
@@ -36,7 +36,7 @@ module Aws
         @io_proxy = IOProxy.new(input, output, error)
         @checkpointer = CheckpointerImpl.new(@io_proxy)
       end
-  
+
       # Starts this KCL processor's main loop.
       def run
         action = @io_proxy.read_action
@@ -45,9 +45,9 @@ module Aws
           action = @io_proxy.read_action
         end
       end
-  
+
       private
-      
+
       # @api private
       # Parses an input action and invokes the appropriate method of the
       # record processor.
@@ -75,7 +75,7 @@ module Aws
       rescue KeyError => ke
         raise MalformedAction.new("Action '#{action}': #{ke.message}")
       end
-  
+
       # @api private
       # Calls the specified method on the record processor, and handles
       # any resulting exceptions by writing to the error stream.
@@ -89,7 +89,7 @@ module Aws
         #   of issue.
         @io_proxy.write_error(processor_error)
       end
-  
+
     end
   end
 end
