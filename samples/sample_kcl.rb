@@ -92,7 +92,7 @@ class SampleRecordProcessor < Aws::KCLrb::RecordProcessorBase
     rescue Aws::KCLrb::CheckpointError => e
       # Here, we simply retry once.
       # More sophisticated retry logic is recommended.
-      checkpointer.checkpoint(last_seq)  if last_seq
+      checkpointer.checkpoint(sequence_number)  if sequence_number
     end
   end
 end
