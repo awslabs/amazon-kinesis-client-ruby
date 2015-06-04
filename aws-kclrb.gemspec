@@ -5,7 +5,7 @@ Gem::Specification.new do |spec|
   spec.summary         = 'Amazon Kinesis Client Library for Ruby'
   spec.description     = 'A ruby interface for the Amazon Kinesis Client Library MultiLangDaemon'
   spec.author          = 'Amazon Web Services'
-  spec.files           = Dir['lib/**/*.rb'] 
+  spec.files           = Dir['lib/**/*.rb']
   spec.files          += Dir['spec/**/*.rb']
   spec.files          += ['README.md', 'LICENSE.txt', 'VERSION', 'NOTICE.txt', '.yardopts', '.rspec']
   spec.license         = 'Amazon Software License'
@@ -13,5 +13,6 @@ Gem::Specification.new do |spec|
   spec.homepage        = 'http://github.com/aws/amazon-kinesis-client-ruby'
   spec.require_paths   = ['lib']
 
+  spec.add_dependency('aws-sdk', '~> 2.0')
   spec.add_dependency('multi_json', '~> 1.0')
 end

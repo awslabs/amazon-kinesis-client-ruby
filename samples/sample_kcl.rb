@@ -1,19 +1,19 @@
 #! /usr/bin/env ruby
 #
 #  Copyright 2014 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# 
+#
 #  Licensed under the Amazon Software License (the "License").
 #  You may not use this file except in compliance with the License.
 #  A copy of the License is located at
-# 
+#
 #  http://aws.amazon.com/asl/
-# 
+#
 #  or in the "license" file accompanying this file. This file is distributed
 #  on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
 #  express or implied. See the License for the specific language governing
 #  permissions and limitations under the License.
 
-require 'aws/kclrb'
+require_relative '../lib/aws/kclrb'
 require 'base64'
 require 'tmpdir'
 require 'fileutils'
@@ -84,15 +84,15 @@ class SampleRecordProcessor < Aws::KCLrb::RecordProcessorBase
 
   private
   # Helper method that retries checkpointing once.
-  # @param checkpointer [Aws::KCLrb::Checkpointer] The checkpointer instance to use. 
-  # @param sequence_number (see Aws::KCLrb::Checkpointer#checkpoint) 
+  # @param checkpointer [Aws::KCLrb::Checkpointer] The checkpointer instance to use.
+  # @param sequence_number (see Aws::KCLrb::Checkpointer#checkpoint)
   def checkpoint_helper(checkpointer, sequence_number=nil)
     begin
       checkpointer.checkpoint(sequence_number)
     rescue Aws::KCLrb::CheckpointError => e
       # Here, we simply retry once.
       # More sophisticated retry logic is recommended.
-      checkpointer.checkpoint(last_seq)  if last_seq
+      checkpointer.checkpoint(sequence_number)  if sequence_number
     end
   end
 end
