@@ -121,7 +121,7 @@ if __FILE__ == $0
       raise OptionParser::ParseError.new("SLEEP_SECONDS must be a non-negative number")  unless sleep_between_puts >= 0.0
     end
     opts.on("-t TIMEOUT_SECONDS", "--timeout TIMEOUT_SECONDS", Float, "How long to keep running. By default producer keeps running indefinitely. (Default: #{timeout})") do |t|
-      timeout = s.to_f
+      timeout = t.to_f
       raise OptionParser::ParseError.new("TIMEOUT_SECONDS must be a non-negative number")  unless timeout >= 0.0
     end
     opts.on("-h", "--help", "Prints this help message.") do
