@@ -39,7 +39,7 @@ class SampleRecordProcessor < Aws::KCLrb::RecordProcessorBase
       FileUtils.mkdir_p @output_directory
       probe_file = File.join(@output_directory, '.kclrb_probe')
       FileUtils.touch(probe_file)
-      FileUtils.rm(probe_file)
+      FileUtils.rm(probe_file, :force => true)
     elsif output
       # assume it's an IO
       @output = output
