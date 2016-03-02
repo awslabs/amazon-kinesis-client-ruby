@@ -14,7 +14,7 @@
 
 require 'aws/kclrb/io_proxy'
 
-module Aws
+module AWS
   module KCLrb
     # Error class used for wrapping exception names passed through the 
     # input stream.

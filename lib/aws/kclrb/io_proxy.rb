@@ -15,7 +15,7 @@
 
 require 'multi_json'
 
-module Aws
+module AWS
   module KCLrb
     # @api private
     # Internal class used by {KCLProcess} and {Checkpointer} to communicate 
