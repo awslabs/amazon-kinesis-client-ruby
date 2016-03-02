@@ -19,13 +19,13 @@ require 'tmpdir'
 require 'fileutils'
 
 # @api private
-# A sample implementation of the {Aws::KCLrb::RecordProcessorBase RecordProcessor}.
+# A sample implementation of the {AWS::KCLrb::RecordProcessorBase RecordProcessor}.
 #
 # All it does is write the data to an output stream. Be careful not to use
 # the `$stdout` as it's used to communicate with the {https://github.com/awslabs/amazon-kinesis-client/blob/master/src/main/java/com/amazonaws/services/kinesis/multilang/package-info.java MultiLangDaemon}.
 # If you use `$stderr` instead the MultiLangDaemon would echo the output
 # to its own standard error stream.
-class SampleRecordProcessor < Aws::KCLrb::RecordProcessorBase
+class SampleRecordProcessor < AWS::KCLrb::RecordProcessorBase
   # @param output [IO, String] If a string is provided, it's assumed to be the path
   #   to an output directory. That directory would be created and permissions to write
   #   to it are asserted.
@@ -48,7 +48,7 @@ class SampleRecordProcessor < Aws::KCLrb::RecordProcessorBase
     end
   end
 
-  # (see Aws::KCLrb::RecordProcessorBase#init_processor)
+  # (see AWS::KCLrb::RecordProcessorBase#init_processor)
   def init_processor(shard_id)
     unless @output
       @filename = File.join(@output_directory, "#{shard_id}-#{Time.now.to_i}.log")
@@ -57,7 +57,7 @@ class SampleRecordProcessor < Aws::KCLrb::RecordProcessorBase
     end
   end
 
-  # (see Aws::KCLrb::RecordProcessorBase#process_records)
+  # (see AWS::KCLrb::RecordProcessorBase#process_records)
   def process_records(records, checkpointer)
     last_seq = nil
     records.each do |record|
@@ -74,7 +74,7 @@ class SampleRecordProcessor < Aws::KCLrb::RecordProcessorBase
     checkpoint_helper(checkpointer, last_seq)  if last_seq
   end
 
-  # (see Aws::KCLrb::RecordProcessorBase#shutdown)
+  # (see AWS::KCLrb::RecordProcessorBase#shutdown)
   def shutdown(checkpointer, reason)
     checkpoint_helper(checkpointer)  if 'TERMINATE' == reason
   ensure
@@ -84,12 +84,12 @@ class SampleRecordProcessor < Aws::KCLrb::RecordProcessorBase
 
   private
   # Helper method that retries checkpointing once.
-  # @param checkpointer [Aws::KCLrb::Checkpointer] The checkpointer instance to use. 
-  # @param sequence_number (see Aws::KCLrb::Checkpointer#checkpoint) 
+  # @param checkpointer [AWS::KCLrb::Checkpointer] The checkpointer instance to use. 
+  # @param sequence_number (see AWS::KCLrb::Checkpointer#checkpoint) 
   def checkpoint_helper(checkpointer, sequence_number=nil)
     begin
       checkpointer.checkpoint(sequence_number)
-    rescue Aws::KCLrb::CheckpointError => e
+    rescue AWS::KCLrb::CheckpointError => e
       # Here, we simply retry once.
       # More sophisticated retry logic is recommended.
       checkpointer.checkpoint(sequence_number) if sequence_number
@@ -100,7 +100,7 @@ end
 if __FILE__ == $0
   # Start the main processing loop
   record_processor = SampleRecordProcessor.new(ARGV[1] || File.join(Dir.tmpdir, 'kclrbsample'))
-  driver = Aws::KCLrb::KCLProcess.new(record_processor)
+  driver = AWS::KCLrb::KCLProcess.new(record_processor)
   driver.run
 end
 

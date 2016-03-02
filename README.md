@@ -15,7 +15,7 @@ executable. A record processor in Ruby typically looks something like:
 
     require 'aws/kclrb'
 
-    class SampleRecordProcessor < Aws::KCLrb::RecordProcessorBase
+    class SampleRecordProcessor < AWS::KCLrb::RecordProcessorBase
       def init_processor(shard_id)
         # initialize
       end
@@ -32,7 +32,7 @@ executable. A record processor in Ruby typically looks something like:
     if __FILE__ == $0
       # Start the main processing loop
       record_processor = SampleRecordProcessor.new
-      driver = Aws::KCLrb::KCLProcess.new(record_processor)
+      driver = AWS::KCLrb::KCLProcess.new(record_processor)
       driver.run
     end
 ```
@@ -85,11 +85,11 @@ To run the data producer, run the following commands:
 
 #### Notes
 
-* The [AWS Ruby SDK gem][aws-ruby-sdk-gem] needs to be installed as a pre-requisite. To install,
+* The [AWS Ruby SDK V1 gem][aws-ruby-sdk-v1-gem] needs to be installed as a pre-requisite. To install,
   run:
 
   ```sh
-      sudo gem install aws-sdk
+      sudo gem install aws-sdk-v1
   ```
 
 * The script `samples/sample_kcl_producer.rb` takes several parameters that you can use
