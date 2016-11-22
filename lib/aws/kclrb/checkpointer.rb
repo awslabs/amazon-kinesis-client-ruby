@@ -75,7 +75,7 @@ module Aws
   
       # (see Checkpointer#checkpoint)
       def checkpoint(sequence_number=nil)
-        @io_proxy.write_action('checkpoint', 'checkpoint' => sequence_number)
+        @io_proxy.write_action('checkpoint', 'sequenceNumber' => sequence_number)
         # Consume the response action
         action = @io_proxy.read_action
         # Happy response is expected to be of the form:
