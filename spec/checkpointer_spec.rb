@@ -20,7 +20,7 @@ module Aws::KCLrb
     describe "#checkpoint" do
       it "should emit a checkpoint action and consume response action" do
         seq_number = rand(100_000).to_s
-        expected_output_string = %Q[{"action":"checkpoint","checkpoint":"#{seq_number}"}]
+        expected_output_string = %Q[{"action":"checkpoint","sequenceNumber":"#{seq_number}"}]
         input_string = %Q[{"action":"checkpoint","checkpoint":"#{seq_number}"}]
         input = StringIO.new(input_string)
         output = StringIO.new
@@ -34,7 +34,7 @@ module Aws::KCLrb
 
       it "should raise a CheckpointError when error is received from MultiLangDaemon" do
         seq_number = rand(100_000).to_s
-        expected_output_string = %Q[{"action":"checkpoint","checkpoint":"#{seq_number}"}]
+        expected_output_string = %Q[{"action":"checkpoint","sequenceNumber":"#{seq_number}"}]
         input_string = %Q[{"action":"checkpoint","checkpoint":"#{seq_number}","error":"ThrottlingException"}]
         input = StringIO.new(input_string)
         output = StringIO.new

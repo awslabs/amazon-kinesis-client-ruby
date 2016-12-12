@@ -69,10 +69,10 @@ module Aws::KCLrb
         input_string = <<-INPUT
 {"action":"initialize","shardId":"shardId-123"}
 {"action":"processRecords","records":[{"data":"bWVvdw==","partitionKey":"cat","sequenceNumber":"456"}]}
-{"action":"checkpoint","checkpoint":"456","error":"ThrottlingException"}
-{"action":"checkpoint","checkpoint":"456"}
+{"action":"checkpoint","sequenceNumber":"456","error":"ThrottlingException"}
+{"action":"checkpoint","sequenceNumber":"456"}
 {"action":"shutdown","reason":"TERMINATE"}
-{"action":"checkpoint","checkpoint":"456"}
+{"action":"checkpoint","sequenceNumber":"456"}
         INPUT
 
         # NOTE: The first checkpoint is expected to fail
@@ -80,10 +80,10 @@ module Aws::KCLrb
         #       retry.
         expected_output_string = <<-OUTPUT
 {"action":"status","responseFor":"initialize"}
-{"action":"checkpoint","checkpoint":"456"}
-{"action":"checkpoint","checkpoint":"456"}
+{"action":"checkpoint","sequenceNumber":"456"}
+{"action":"checkpoint","sequenceNumber":"456"}
 {"action":"status","responseFor":"processRecords"}
-{"action":"checkpoint","checkpoint":null}
+{"action":"checkpoint","sequenceNumber":null}
 {"action":"status","responseFor":"shutdown"}
         OUTPUT
         processor = TestRecordProcessor.new
