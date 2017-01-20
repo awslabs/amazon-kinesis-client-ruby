@@ -177,6 +177,9 @@ all languages.
 
 ## Release Notes
 
+### Release 1.0.1 (January 19, 2017)
+* Upgraded to use version 1.7.2 of the [Amazon Kinesis Client library][amazon-kcl-github]
+
 ### Release 1.0.0 (December 30, 2014)
 * **aws-kclrb** gem which exposes an interface to allow implementation of record processors in Ruby
   using the Amazon KCL's [MultiLangDaemon][multi-lang-daemon]
