@@ -82,6 +82,14 @@ class SampleRecordProcessor < Aws::KCLrb::RecordProcessorBase
     @output.close  if @close
   end
 
+  def shutdown_requested(checkpointer, reason)
+    STDERR.puts 'Requesting a shutdown'
+    checkpoint_helper(checkpointer) if 'REQUESTED' == reason
+  ensure
+    # Make sure to cleanup state
+    @output.close if @close
+  end
+
   private
   # Helper method that retries checkpointing once.
   # @param checkpointer [Aws::KCLrb::Checkpointer] The checkpointer instance to use. 
