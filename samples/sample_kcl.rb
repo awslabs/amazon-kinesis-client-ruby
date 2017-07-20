@@ -80,11 +80,10 @@ class SampleRecordProcessor < Aws::KCLrb::RecordProcessorBase
     @output.close unless @output.closed?
   end
 
+  # (see Aws::KCLrb::RecordProcessorBase#shutdown_requested)
   def shutdown_requested(checkpointer)
+    STDERR.puts 'shutdownRequested is being called.'
     checkpoint_helper(checkpointer)
-  ensure
-    # Make sure to cleanup state
-    @output.close unless @output.closed?
   end
 
   private

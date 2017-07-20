@@ -73,6 +73,12 @@ module Aws
         fail NotImplementedError.new
       end
 
+      # @abstract
+      # Called by a KCLProcess instance to indicate that this record processor
+      # is requesting a shutdown. This method should be overriden if required.
+      #
+      # @param checkpointer [Checkpointer] A checkpointer which accepts a sequence
+      #   number or no parameters.
       def shutdown_requested(checkpointer)
       end
     end
