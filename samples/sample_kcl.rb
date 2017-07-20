@@ -82,7 +82,6 @@ class SampleRecordProcessor < Aws::KCLrb::RecordProcessorBase
 
   # (see Aws::KCLrb::RecordProcessorBase#shutdown_requested)
   def shutdown_requested(checkpointer)
-    STDERR.puts 'shutdownRequested is being called.'
     checkpoint_helper(checkpointer)
   end
 
