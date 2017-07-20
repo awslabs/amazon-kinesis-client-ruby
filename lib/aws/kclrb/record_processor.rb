@@ -73,8 +73,7 @@ module Aws
         fail NotImplementedError.new
       end
 
-      def shutdown_requested(checkpointer, reason)
-        fail NotImplementedError.new
+      def shutdown_requested(checkpointer)
       end
     end
   end
