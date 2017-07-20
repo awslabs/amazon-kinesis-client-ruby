@@ -79,15 +79,14 @@ class SampleRecordProcessor < Aws::KCLrb::RecordProcessorBase
     checkpoint_helper(checkpointer)  if 'TERMINATE' == reason
   ensure
     # Make sure to cleanup state
-    @output.close  if @close
+    @output.close if @close
   end
 
   def shutdown_requested(checkpointer)
-    STDERR.puts 'Requesting a shutdown'
     checkpoint_helper(checkpointer)
   ensure
     # Make sure to cleanup state
-    @output.close if @close
+    @output.close unless @output.closed?
   end
 
   private
