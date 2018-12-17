@@ -20,7 +20,7 @@ directory JAR_DIR
 
 def get_maven_jar_info(group_id, artifact_id, version)
   jar_name = "#{artifact_id}-#{version}.jar"
-  jar_url = "http://repo1.maven.org/maven2/#{group_id.gsub(/\./, '/')}/#{artifact_id}/#{version}/#{jar_name}"
+  jar_url = "https://repo1.maven.org/maven2/#{group_id.gsub(/\./, '/')}/#{artifact_id}/#{version}/#{jar_name}"
   local_jar_file = File.join(JAR_DIR, jar_name)
   [jar_name, jar_url, local_jar_file]
 end
