@@ -68,6 +68,8 @@ module Aws
           dispatch_to_processor(:process_records, action.fetch('records'), @checkpointer)
         when 'shutdown'
           dispatch_to_processor(:shutdown, @checkpointer, action.fetch('reason'))
+        when 'shutdownRequested'
+          dispatch_to_processor(:shutdown_requested, @checkpointer)
         else
           raise MalformedAction.new("Received an action which couldn't be understood. Action was '#{action}'")
         end

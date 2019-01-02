@@ -30,7 +30,6 @@ class SampleRecordProcessor < Aws::KCLrb::RecordProcessorBase
   #   to an output directory. That directory would be created and permissions to write
   #   to it are asserted.
   def initialize(output=$stderr)
-    @close = false
     if output.is_a?(String)
       @output_directory = output
       # Make sure the directory exists and that we can
@@ -53,7 +52,6 @@ class SampleRecordProcessor < Aws::KCLrb::RecordProcessorBase
     unless @output
       @filename = File.join(@output_directory, "#{shard_id}-#{Time.now.to_i}.log")
       @output = open(@filename, 'w')
-      @close = true
     end
   end
 
@@ -79,7 +77,12 @@ class SampleRecordProcessor < Aws::KCLrb::RecordProcessorBase
     checkpoint_helper(checkpointer)  if 'TERMINATE' == reason
   ensure
     # Make sure to cleanup state
-    @output.close  if @close
+    @output.close unless @output.closed?
+  end
+
+  # (see Aws::KCLrb::RecordProcessorBase#shutdown_requested)
+  def shutdown_requested(checkpointer)
+    checkpoint_helper(checkpointer)
   end
 
   private
