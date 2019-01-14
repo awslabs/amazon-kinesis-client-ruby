@@ -15,7 +15,7 @@
 require 'aws/kclrb/io_proxy'
 require 'aws/kclrb/checkpointer'
 
-module Aws
+module AWS
   module KCLrb
     # Error raised if the {KCLProcess} received an input action that it
     # could not parse or it could not handle.

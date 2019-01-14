@@ -15,7 +15,7 @@
 require 'aws/kclrb/io_proxy.rb'
 require 'aws/kclrb/checkpointer.rb'
 
-module Aws::KCLrb
+module AWS::KCLrb
   describe Checkpointer do
     describe "#checkpoint" do
       it "should emit a checkpoint action and consume response action" do

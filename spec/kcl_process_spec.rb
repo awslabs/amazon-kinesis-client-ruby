@@ -15,7 +15,7 @@
 require 'aws/kclrb/kcl_process'
 require 'aws/kclrb/record_processor'
 
-module Aws::KCLrb
+module AWS::KCLrb
   # Dummy test class.
   # The {#process_reocrds} method will retry the checkpointing call
   #   in case of a throttling exception.

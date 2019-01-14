@@ -14,7 +14,7 @@
 
 require 'aws/kclrb/io_proxy'
 
-module Aws::KCLrb
+module AWS::KCLrb
   describe IOProxy do
     describe "#read_line" do
       it "should skip blank lines" do
