@@ -14,13 +14,16 @@
 
 require 'aws/kclrb/io_proxy'
 require 'aws/kclrb/checkpointer'
+require 'aws/kclrb/messages'
+require 'aws/kclrb/record_processor'
 
 module Aws
   module KCLrb
     # Error raised if the {KCLProcess} received an input action that it
     # could not parse or it could not handle.
-    class MalformedAction < RuntimeError; end
-  
+    class MalformedAction < RuntimeError;
+    end
+
     # Entry point for a KCL application in Ruby.
     #
     # Implementers of KCL applications in Ruby should instantiate this
@@ -31,12 +34,16 @@ module Aws
       # @param input [IO] An `IO`-like object to read input lines from.
       # @param output [IO] An `IO`-like object to write output lines to.
       # @param error [IO] An `IO`-like object to write error lines to.
-      def initialize(processor, input=$stdin, output=$stdout, error=$stderr)
-        @processor = processor
+      def initialize(processor, input = $stdin, output = $stdout, error = $stderr)
+        if processor.version == 1
+          @processor = Aws::KCLrb::V2::V2ToV1Adapter.new(processor)
+        else
+          @processor = processor
+        end
         @io_proxy = IOProxy.new(input, output, error)
         @checkpointer = CheckpointerImpl.new(@io_proxy)
       end
-  
+
       # Starts this KCL processor's main loop.
       def run
         action = @io_proxy.read_action
@@ -45,9 +52,9 @@ module Aws
           action = @io_proxy.read_action
         end
       end
-  
+
       private
-      
+
       # @api private
       # Parses an input action and invokes the appropriate method of the
       # record processor.
@@ -63,13 +70,20 @@ module Aws
         action_name = action.fetch('action')
         case action_name
         when 'initialize'
-          dispatch_to_processor(:init_processor, action.fetch('shardId'))
+          dispatch_to_processor(:init_processor,
+                                Aws::KCLrb::V2::InitializeInput.new(action.fetch('shardId'),
+                                                                    action.fetch('sequenceNumber')))
         when 'processRecords'
-          dispatch_to_processor(:process_records, action.fetch('records'), @checkpointer)
-        when 'shutdown'
-          dispatch_to_processor(:shutdown, @checkpointer, action.fetch('reason'))
+          dispatch_to_processor(:process_records,
+                                Aws::KCLrb::V2::ProcessRecordsInput.new(action.fetch('records'),
+                                                                        action.fetch('millisBehindLatest'),
+                                                                        @checkpointer))
+        when 'leaseLost'
+          dispatch_to_processor(:lease_lost, Aws::KCLrb::V2::LeaseLostInput.new)
+        when 'shardEnded'
+          dispatch_to_processor(:shard_ended, Aws::KCLrb::V2::ShardEndedInput.new(@checkpointer))
         when 'shutdownRequested'
-          dispatch_to_processor(:shutdown_requested, @checkpointer)
+          dispatch_to_processor(:shutdown_requested, Aws::KCLrb::V2::ShutdownRequestedInput.new(@checkpointer))
         else
           raise MalformedAction.new("Received an action which couldn't be understood. Action was '#{action}'")
         end
@@ -77,7 +91,7 @@ module Aws
       rescue KeyError => ke
         raise MalformedAction.new("Action '#{action}': #{ke.message}")
       end
-  
+
       # @api private
       # Calls the specified method on the record processor, and handles
       # any resulting exceptions by writing to the error stream.
@@ -91,7 +105,7 @@ module Aws
         #   of issue.
         @io_proxy.write_error(processor_error)
       end
-  
+
     end
   end
 end
