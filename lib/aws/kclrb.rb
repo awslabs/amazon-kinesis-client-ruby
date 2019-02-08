@@ -13,4 +13,5 @@
 #  permissions and limitations under the License.
 
 require 'aws/kclrb/record_processor'
+require 'aws/kclrb/messages'
 require 'aws/kclrb/kcl_process'

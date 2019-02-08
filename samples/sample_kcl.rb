@@ -1,13 +1,13 @@
 #! /usr/bin/env ruby
 #
-#  Copyright 2014 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# 
+#  Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#
 #  Licensed under the Amazon Software License (the "License").
 #  You may not use this file except in compliance with the License.
 #  A copy of the License is located at
-# 
+#
 #  http://aws.amazon.com/asl/
-# 
+#
 #  or in the "license" file accompanying this file. This file is distributed
 #  on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
 #  express or implied. See the License for the specific language governing
@@ -15,8 +15,7 @@
 
 require 'aws/kclrb'
 require 'base64'
-require 'tmpdir'
-require 'fileutils'
+require 'date'
 
 # @api private
 # A sample implementation of the {Aws::KCLrb::RecordProcessorBase RecordProcessor}.
@@ -25,71 +24,52 @@ require 'fileutils'
 # the `$stdout` as it's used to communicate with the {https://github.com/awslabs/amazon-kinesis-client/blob/master/src/main/java/com/amazonaws/services/kinesis/multilang/package-info.java MultiLangDaemon}.
 # If you use `$stderr` instead the MultiLangDaemon would echo the output
 # to its own standard error stream.
-class SampleRecordProcessor < Aws::KCLrb::RecordProcessorBase
-  # @param output [IO, String] If a string is provided, it's assumed to be the path
-  #   to an output directory. That directory would be created and permissions to write
-  #   to it are asserted.
-  def initialize(output=$stderr)
-    if output.is_a?(String)
-      @output_directory = output
-      # Make sure the directory exists and that we can
-      # write to it. If not, this will fail and processing
-      # can't start.
-      FileUtils.mkdir_p @output_directory
-      probe_file = File.join(@output_directory, '.kclrb_probe')
-      FileUtils.touch(probe_file)
-      FileUtils.rm(probe_file)
-    elsif output
-      # assume it's an IO
-      @output = output
-    else
-      fail "Output destination cannot be nil"
-    end
+class SampleRecordProcessor < Aws::KCLrb::V2::RecordProcessorBase
+  # (see Aws::KCLrb::V2::RecordProcessorBase#init_processor)
+  def init_processor(initialize_input)
+    @shard_id = initialize_input['shardId']
+    @checkpoint_freq_seconds = 10
   end
 
-  # (see Aws::KCLrb::RecordProcessorBase#init_processor)
-  def init_processor(shard_id)
-    unless @output
-      @filename = File.join(@output_directory, "#{shard_id}-#{Time.now.to_i}.log")
-      @output = open(@filename, 'w')
-    end
-  end
-
-  # (see Aws::KCLrb::RecordProcessorBase#process_records)
-  def process_records(records, checkpointer)
+  # (see Aws::KCLrb::V2::RecordProcessorBase#process_records)
+  def process_records(process_records_input)
     last_seq = nil
+    records = process_records_input.records
     records.each do |record|
-      begin
-        @output.puts Base64.decode64(record['data'])
-        @output.flush
-        last_seq = record['sequenceNumber']
-      rescue => e
-        # Make sure to handle all exceptions.
-        # Anything you write to STDERR will simply be echoed by parent process
-        STDERR.puts "#{e}: Failed to process record '#{record}'"
-      end
+      data = Base64.decode64(record['data'])
+      process_record(record, data)
+      last_seq = record['sequenceNumber']
     end
-    checkpoint_helper(checkpointer, last_seq)  if last_seq
+
+    # Checking if last sequenceNumber is not nil and if it has been more than @check_freq_seconds before checkpointing.
+    if last_seq &&
+        ((@last_checkpoint_time.nil?) || ((DateTime.now - @last_checpoint_time) * 86400 > @checkpoint_freq_seconds))
+      checkpoint_helper(process_records_input.checkpointer, last_seq)
+      @last_checpoint_time = DateTime.now
+    end
   end
 
-  # (see Aws::KCLrb::RecordProcessorBase#shutdown)
-  def shutdown(checkpointer, reason)
-    checkpoint_helper(checkpointer)  if 'TERMINATE' == reason
-  ensure
-    # Make sure to cleanup state
-    @output.close unless @output.closed?
+  # (see Aws::KCLrb::V2::RecordProcessorBase#lease_lost)
+  def lease_lost(lease_lost_input)
+    #   Lease was stolen by another Worker.
   end
 
-  # (see Aws::KCLrb::RecordProcessorBase#shutdown_requested)
-  def shutdown_requested(checkpointer)
-    checkpoint_helper(checkpointer)
+  # (see Aws::KCLrb::V2::RecordProcessorBase#shard_ended)
+  def shard_ended(shard_ended_input)
+    checkpoint_helper(shard_ended_input.checkpointer)
+  end
+
+  # (see Aws::KCLrb::V2::RecordProcessorBase#shutdown_requested)
+  def shutdown_requested(shutdown_requested_input)
+    checkpoint_helper(shutdown_requested_input.checkpointer)
   end
 
   private
+
   # Helper method that retries checkpointing once.
-  # @param checkpointer [Aws::KCLrb::Checkpointer] The checkpointer instance to use. 
-  # @param sequence_number (see Aws::KCLrb::Checkpointer#checkpoint) 
-  def checkpoint_helper(checkpointer, sequence_number=nil)
+  # @param checkpointer [Aws::KCLrb::Checkpointer] The checkpointer instance to use.
+  # @param sequence_number (see Aws::KCLrb::Checkpointer#checkpoint)
+  def checkpoint_helper(checkpointer, sequence_number = nil)
     begin
       checkpointer.checkpoint(sequence_number)
     rescue Aws::KCLrb::CheckpointError => e
@@ -98,12 +78,26 @@ class SampleRecordProcessor < Aws::KCLrb::RecordProcessorBase
       checkpointer.checkpoint(sequence_number) if sequence_number
     end
   end
+
+  # Called for each record that is passed to record_processor.
+  # @param record Kinesis record
+  def process_record(record, data)
+    begin
+      if data.nil?
+        length = 0
+      else
+        length = data.length
+      end
+      STDERR.puts("ShardId: #{@shard_id}, Partition Key: #{record['partitionKey']}, Sequence Number:#{record['sequenceNumber']}, Length of data: #{length}")
+    rescue => e
+      STDERR.puts "#{e}: Failed to process record '#{record}'"
+    end
+  end
 end
 
 if __FILE__ == $0
   # Start the main processing loop
-  record_processor = SampleRecordProcessor.new(ARGV[1] || File.join(Dir.tmpdir, 'kclrbsample'))
-  driver = Aws::KCLrb::KCLProcess.new(record_processor)
+  driver = Aws::KCLrb::KCLProcess.new(SampleRecordProcessor.new)
   driver.run
 end
 
