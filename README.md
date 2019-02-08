@@ -15,7 +15,7 @@ executable. A record processor in Ruby typically looks something like:
 
     require 'aws/kclrb'
 
-    class SampleRecordProcessor < Aws::KCLrb::RecordProcessorBase
+    class SampleRecordProcessor < Aws::KCLrb::V2::RecordProcessorBase
       def init_processor(initialize_input)
         # initialize
       end
