@@ -27,7 +27,7 @@ require 'date'
 class SampleRecordProcessor < Aws::KCLrb::V2::RecordProcessorBase
   # (see Aws::KCLrb::V2::RecordProcessorBase#init_processor)
   def init_processor(initialize_input)
-    @shard_id = initialize_input['shardId']
+    @shard_id = initialize_input.shard_id
     @checkpoint_freq_seconds = 10
   end
 
