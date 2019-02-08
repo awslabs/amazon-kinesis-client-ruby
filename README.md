@@ -16,16 +16,24 @@ executable. A record processor in Ruby typically looks something like:
     require 'aws/kclrb'
 
     class SampleRecordProcessor < Aws::KCLrb::RecordProcessorBase
-      def init_processor(shard_id)
+      def init_processor(initialize_input)
         # initialize
       end
 
-      def process_records(records, checkpointer)
+      def process_records(process_records_input)
         # process batch of records
       end
 
-      def shutdown(checkpointer, reason)
-        # cleanup
+      def lease_lost(lease_lost_input)
+        # lease was lost, cleanup
+      end
+
+      def shard_ended(shard_ended_input)
+        # shard has ended, cleanup
+      end
+
+      def shutdown_requested(shutdown_requested_input)
+        # shutdown has been requested
       end
     end
 
@@ -69,10 +77,11 @@ The sample application consists of two components:
 The following defaults are used in the sample application:
 
 * *Stream name*: `kclrbsample`
+* *Region*: `us-east-1`
 * *Number of shards*: 2
 * *Amazon KCL application name*: `RubyKCLSample`
-* *Amazon DynamoDB table for Amazon KCL application*: `RubyKCLSample`
-* *Sample application output directory*: `/tmp/kclrbsample/`
+* *Amazon DynamoDB table for KCL application*: `RubyKCLSample`
+* *Amazon CloudWatch metrics namespace for KCL application*: `RubyKCLSample`
 
 ### Running the Data Producer
 
@@ -105,7 +114,7 @@ To run the data processor, run the following commands:
 
 ```sh
     cd samples
-    rake run
+    rake run properties_file=sample.properties
 ```
 
 #### Notes
@@ -118,6 +127,7 @@ To run the data processor, run the following commands:
   * `executableName = samples/sample_kcl.rb`
   * `streamName = kclrbsample`
   * `applicationName = RubyKCLSample`
+  * `regionName = us-east-1`
 
 ### Cleaning Up
 
@@ -126,7 +136,7 @@ create a real DynamoDB table to track the Amazon KCL application state, thus pot
 incurring AWS costs. Once done, you can log in to AWS management console and delete these
 resources. Specifically, the sample application will create in your default AWS region
 
-* an *Amazon Kinesis stream* named `kclrbsample`
+* an *Amazon Kinesis Data Stream* named `kclrbsample`
 * an *Amazon DynamoDB table* named `RubyKCLSample`
 
 ## Running on Amazon EC2
@@ -147,7 +157,7 @@ Amazon Linux can be found at `/usr/bin/java` and should be 1.7 or greater.
     cd kclrb/samples
     rake run_producer
     # ... and in another terminal
-    rake run
+    rake run properties_file=sample.properties
 ```
 
 ## Under the Hood - What You Should Know about Amazon KCL's [MultiLangDaemon][multi-lang-daemon]
