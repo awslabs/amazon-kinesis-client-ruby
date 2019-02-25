@@ -187,6 +187,30 @@ all languages.
 
 ## Release Notes
 
+### Release 2.0.0 (February 26, 2019)
+* Added support for [Enhanced Fan-Out](https://aws.amazon.com/blogs/aws/kds-enhanced-fanout/).  
+  Enhanced Fan-Out provides dedicated throughput per stream consumer, and uses an HTTP/2 push API (SubscribeToShard) to deliver records with lower latency.
+* Updated the Amazon Kinesis Client Library for Java to version 2.1.2.
+  * Version 2.1.2 uses 4 additional Kinesis API's  
+    __WARNING: These additional API's may require updating any explicit IAM policies__
+    * [`RegisterStreamConsumer`](https://docs.aws.amazon.com/kinesis/latest/APIReference/API_RegisterStreamConsumer.html)
+    * [`SubscribeToShard`](https://docs.aws.amazon.com/kinesis/latest/APIReference/API_SubscribeToShard.html)
+    * [`DescribeStreamConsumer`](https://docs.aws.amazon.com/kinesis/latest/APIReference/API_DescribeStreamConsumer.html)
+    * [`DescribeStreamSummary`](https://docs.aws.amazon.com/kinesis/latest/APIReference/API_DescribeStreamSummary.html)
+  * For more information about Enhanced Fan-Out with the Amazon Kinesis Client Library please see the [announcement](https://aws.amazon.com/blogs/aws/kds-enhanced-fanout/) and [developer documentation](https://docs.aws.amazon.com/streams/latest/dev/introduction-to-enhanced-consumers.html).
+* Added version 2 of the [`RecordProcessorBase`](https://github.com/awslabs/amazon-kinesis-client-ruby/blob/d5c2bbafb232b5e1ab947980a0bd8505c87978f9/lib/aws/kclrb/record_processor.rb#L102) which supports the new `ShardRecordProcessor` interface
+  * The `shutdown` method from version 1 has been replaced by `lease_lost` and `shard_ended`.
+  * Added the `lease_lost` method which is invoked when a lease is lost.  
+    `lease_lost` replaces `shutdown(checkpointer, 'ZOMBIE')`.
+  * Added the `shard_ended` method which is invoked when all records from a split or merge have been processed.  
+    `shard_ended` replaces `shutdown(checkpointer, 'TERMINATE')`.
+  * Added an optional method, `shutdown_requested`, which provides the record processor a last chance to checkpoint during the Amazon Kinesis Client Library shutdown process before the lease is canceled.  
+    * To control how long the Amazon Kinesis Client Library waits for the record processors to complete shutdown, add `timeoutInSeconds=<seconds to wait>` to your properties file.
+* Updated the AWS Java SDK version to 2.4.0
+* MultiLangDaemon now provides logging using Logback.
+  * MultiLangDaemon supports custom configurations for logging via a Logback XML configuration file.
+  * The example [Rakefile](https://github.com/awslabs/amazon-kinesis-client-ruby/blob/master/samples/Rakefile) supports setting the logging configuration by adding `log_configuration=<log configuration file>` to the Rake command line.
+
 ### Release 1.0.1 (January 19, 2017)
 * Upgraded to use version 1.7.2 of the [Amazon Kinesis Client library][amazon-kcl-github]
 
