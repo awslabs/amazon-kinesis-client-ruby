@@ -36,8 +36,8 @@ end
 
 MAVEN_PACKAGES = [
     # (group id, artifact id, version),
-    ['software.amazon.kinesis', 'amazon-kinesis-client-multilang', '2.1.1'],
-    ['software.amazon.kinesis', 'amazon-kinesis-client', '2.1.1'],
+    ['software.amazon.kinesis', 'amazon-kinesis-client-multilang', '2.1.2'],
+    ['software.amazon.kinesis', 'amazon-kinesis-client', '2.1.2'],
     ['software.amazon.awssdk', 'kinesis', '2.4.0'],
     ['software.amazon.awssdk', 'aws-cbor-protocol', '2.4.0'],
     ['com.fasterxml.jackson.dataformat', 'jackson-dataformat-cbor', '2.9.8'],
