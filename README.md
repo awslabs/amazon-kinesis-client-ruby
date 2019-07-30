@@ -230,3 +230,7 @@ all languages.
 [DefaultAWSCredentialsProviderChain]: http://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/auth/DefaultAWSCredentialsProviderChain.html
 [kinesis-forum]: http://developer.amazonwebservices.com/connect/forum.jspa?forumID=169
 [aws-ruby-sdk-gem]: https://rubygems.org/gems/aws-sdk
+
+## License
+
+This library is licensed under the Apache 2.0 License.

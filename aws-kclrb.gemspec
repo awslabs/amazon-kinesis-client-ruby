@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.files           = Dir['lib/**/*.rb'] 
   spec.files          += Dir['spec/**/*.rb']
   spec.files          += ['README.md', 'LICENSE.txt', 'VERSION', 'NOTICE.txt', '.yardopts', '.rspec']
-  spec.licenses         = ['Amazon Software License']
+  spec.licenses         = ['Apache-2.0']
   spec.platform        = Gem::Platform::RUBY
   spec.homepage        = 'http://github.com/aws/amazon-kinesis-client-ruby'
   spec.require_paths   = ['lib']
