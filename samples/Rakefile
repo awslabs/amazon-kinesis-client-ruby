@@ -1,8 +1,9 @@
 #
 #  Copyright 2014 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #  SPDX-License-Identifier: Apache-2.0
-
 require 'open-uri'
+require 'byebug'
+require 'pathname'
 
 SAMPLES_DIR = File.dirname(__FILE__)
 JAR_DIR = File.join(SAMPLES_DIR, 'jars')
@@ -90,10 +91,12 @@ MAVEN_PACKAGES = [
     ['commons-collections', 'commons-collections', '3.2.2']
 ]
 
+desc "download jar files"
 task :download_jars => [JAR_DIR]
 
 MAVEN_PACKAGES.each do |jar|
   _, _, local_jar_file = get_maven_jar_info(*jar)
+  #desc "downlods jar file"
   file local_jar_file do
     puts "Downloading '#{local_jar_file}' from maven..."
     download_maven_jar(*jar)
@@ -110,12 +113,13 @@ task :run_producer do |t|
   sh *commands
 end
 
-desc "Run KCL sample processor"
-task :run => :download_jars do |t|
+desc "Run KCL sample processor aka consumer"
+task :run_consumer => :download_jars do |t|
   java_home = ENV['JAVA_HOME']
   fail "JAVA_HOME environment variable not set." unless java_home
   properties_file = ENV['properties_file']
-  unless properties_file
+  properties_file = './sample.properties' if properties_file.nil?
+  unless Pathname.new(properties_file).exist?
     fail "Properties file not provided. Use \"rake run properties_file=<PATH_TO_FILE> to provide it.\""
   end
   log_configuration = ENV['log_configuration']

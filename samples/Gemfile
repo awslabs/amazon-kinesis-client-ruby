@@ -1,0 +1,8 @@
+source 'https://rubygems.org'
+
+gem 'aws-sdk', '~> 3.0', '>= 3.0.1'
+gem 'multi_json', '~> 1.13', '>= 1.13.1'
+gem 'pry', '~> 0.12.2'
+gem 'pry-byebug', '~> 3.7'
+gem 'byebug', '~> 11.0', '>= 11.0.1'
+gem 'aws-kclrb', '~> 2.0'
