@@ -113,6 +113,16 @@ task :run_producer do |t|
   sh *commands
 end
 
+desc "adds a single record to the stream"
+task :put_record, [:data] do |t, args|
+  fail "you must provide 'data' for the record you want to add" unless args.data
+  puts "adding record with data: #{args.data}"
+  commands = %W(
+  #{SAMPLES_DIR}/sample_kcl_producer.rb -o #{args.data}
+  )
+  sh *commands
+end
+
 desc "Run KCL sample processor aka consumer"
 task :run_consumer => :download_jars do |t|
   java_home = ENV['JAVA_HOME']

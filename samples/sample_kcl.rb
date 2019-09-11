@@ -78,7 +78,7 @@ class SampleRecordProcessor < Aws::KCLrb::V2::RecordProcessorBase
       else
         length = data.length
       end
-      STDERR.puts("ShardId: #{@shard_id}, Partition Key: #{record['partitionKey']}, Sequence Number:#{record['sequenceNumber']}, Length of data: #{length}")
+      STDERR.puts("ShardId: #{@shard_id}, Partition Key: #{record['partitionKey']}, Sequence Number:#{record['sequenceNumber']}, Length of data: #{length}, data: #{data}")
     rescue => e
       STDERR.puts "#{e}: Failed to process record '#{record}'"
     end
