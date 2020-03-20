@@ -101,7 +101,7 @@ if __FILE__ == $0
       stream_name = s
     end
     opts.on("-d SHARD_COUNT", "--shards SHARD_COUNT", "Number of shards to use when creating the stream. (Default: 2)") do |s|
-      stream_name = s
+      shard_count = s.to_i
     end
     opts.on("-r REGION_NAME", "--region REGION_NAME", "AWS region name (see http://tinyurl.com/cc9cap7). (Default: SDK default)") do |r|
       aws_region = r
