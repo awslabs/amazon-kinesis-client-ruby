@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.files          += ['README.md', 'LICENSE.txt', 'VERSION', 'NOTICE.txt', '.yardopts', '.rspec']
   spec.licenses         = ['Apache-2.0']
   spec.platform        = Gem::Platform::RUBY
-  spec.homepage        = 'http://github.com/aws/amazon-kinesis-client-ruby'
+  spec.homepage        = 'https://github.com/awslabs/amazon-kinesis-client-ruby'
   spec.require_paths   = ['lib']
 
   spec.add_dependency('multi_json', '~> 1.0')

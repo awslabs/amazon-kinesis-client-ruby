@@ -114,7 +114,7 @@ To run the data processor, run the following commands:
 
 ```sh
     cd samples
-    rake run properties_file=sample.properties
+    rake run_consumer properties_file=sample.properties
 ```
 
 #### Notes
@@ -157,7 +157,7 @@ Amazon Linux can be found at `/usr/bin/java` and should be 1.7 or greater.
     cd kclrb/samples
     rake run_producer
     # ... and in another terminal
-    rake run properties_file=sample.properties
+    rake run_consumer properties_file=sample.properties
 ```
 
 ## Under the Hood - What You Should Know about Amazon KCL's [MultiLangDaemon][multi-lang-daemon]

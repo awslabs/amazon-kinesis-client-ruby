@@ -3,9 +3,10 @@
 #  Copyright 2014 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #  SPDX-License-Identifier: Apache-2.0
 
-require 'aws-sdk-core'
 require 'multi_json'
 require 'optparse'
+require 'aws-sdk'
+require 'byebug'
 
 # @api private
 class SampleProducer
@@ -63,6 +64,11 @@ class SampleProducer
     puts "Put record to shard '#{r[:shard_id]}' (#{r[:sequence_number]}): '#{MultiJson.dump(data)}'"
   end
 
+  def only_record_to_put(data)
+    r = @kinesis.put_record(:stream_name => @stream_name, :data => data.to_s, :partition_key => to_s)
+    puts "Put record to shard '#{r[:shard_id]}' (#{r[:sequence_number]}): '#{MultiJson.dump(data)}'"
+  end
+
   private
   def get_data
     {
@@ -94,6 +100,7 @@ if __FILE__ == $0
   shard_count = nil
   sleep_between_puts = 0.25
   timeout = 0
+  only_record_to_put = nil
   # Get and parse options
   option_parser = OptionParser.new do |opts|
     opts.banner = "Usage: #{File.basename($0)} [options]"
@@ -118,6 +125,9 @@ if __FILE__ == $0
       puts opts
       exit
     end
+    opts.on("-o DATA", "--only_record_to_put DATA", "provide data for the only record to put ont he stream") do |d|
+      only_record_to_put = d
+    end
   end
   begin
     option_parser.parse!
@@ -133,7 +143,13 @@ if __FILE__ == $0
   kconfig = {}
   kconfig[:region] = aws_region  if aws_region
   kinesis = Aws::Kinesis::Client.new(kconfig)
-
   producer = SampleProducer.new(kinesis, stream_name, sleep_between_puts, shard_count)
-  producer.run(timeout)
+
+  if only_record_to_put
+    producer.only_record_to_put(only_record_to_put)
+  else
+    producer.run(timeout)
+  end
+
+
 end
