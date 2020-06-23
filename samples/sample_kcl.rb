@@ -33,9 +33,9 @@ class SampleRecordProcessor < Aws::KCLrb::V2::RecordProcessorBase
 
     # Checking if last sequenceNumber is not nil and if it has been more than @check_freq_seconds before checkpointing.
     if last_seq &&
-        ((@last_checkpoint_time.nil?) || ((DateTime.now - @last_checpoint_time) * 86400 > @checkpoint_freq_seconds))
+        ((@last_checkpoint_time.nil?) || ((DateTime.now - @last_checkpoint_time) * 86400 > @checkpoint_freq_seconds))
       checkpoint_helper(process_records_input.checkpointer, last_seq)
-      @last_checpoint_time = DateTime.now
+      @last_checkpoint_time = DateTime.now
     end
   end
 
