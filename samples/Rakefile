@@ -17,7 +17,7 @@ end
 
 def download_maven_jar(group_id, artifact_id, version)
   jar_name, jar_url, local_jar_file = get_maven_jar_info(group_id, artifact_id, version)
-  open(jar_url) do |remote_jar|
+  URI.open(jar_url) do |remote_jar|
     open(local_jar_file, 'w') do |local_jar|
       IO.copy_stream(remote_jar, local_jar)
     end
