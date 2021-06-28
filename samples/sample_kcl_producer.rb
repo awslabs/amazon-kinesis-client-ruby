@@ -4,6 +4,7 @@
 #  SPDX-License-Identifier: Apache-2.0
 
 require 'aws-sdk-core'
+require 'aws-sdk-kinesis'
 require 'multi_json'
 require 'optparse'
 
@@ -30,7 +31,7 @@ class SampleProducer
       @kinesis.delete_stream(:stream_name => @stream_name)
       puts "Deleted stream #{@stream_name}"
     rescue Aws::Kinesis::Errors::ResourceNotFoundException
-      # nothing to do 
+      # nothing to do
     end
   end
 
