@@ -5,7 +5,7 @@
 require 'open-uri'
 
 SAMPLES_DIR = File.dirname(__FILE__)
-JAR_DIR = File.join(SAMPLES_DIR, 'jars')
+JAR_DIR = ENV.fetch('JAR_DIR', File.join(SAMPLES_DIR, 'jars'))
 directory JAR_DIR
 
 def get_maven_jar_info(group_id, artifact_id, version)
@@ -17,7 +17,7 @@ end
 
 def download_maven_jar(group_id, artifact_id, version)
   jar_name, jar_url, local_jar_file = get_maven_jar_info(group_id, artifact_id, version)
-  open(jar_url) do |remote_jar|
+  URI.open(jar_url) do |remote_jar|
     open(local_jar_file, 'w') do |local_jar|
       IO.copy_stream(remote_jar, local_jar)
     end
@@ -110,7 +110,7 @@ task :run_producer do |t|
   sh *commands
 end
 
-desc "Run KCL sample processor"
+desc "Run KCL processor"
 task :run => :download_jars do |t|
   java_home = ENV['JAVA_HOME']
   fail "JAVA_HOME environment variable not set." unless java_home
@@ -119,7 +119,7 @@ task :run => :download_jars do |t|
     fail "Properties file not provided. Use \"rake run properties_file=<PATH_TO_FILE> to provide it.\""
   end
   log_configuration = ENV['log_configuration']
-  puts "Running the Kinesis sample processing application..."
+  puts "Running the Kinesis processing application..."
   classpath = FileList["#{JAR_DIR}/*.jar"].join(':')
   classpath += ":#{SAMPLES_DIR}"
   ENV['PATH'] = "#{ENV['PATH']}:#{SAMPLES_DIR}"
