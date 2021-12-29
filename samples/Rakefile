@@ -1,43 +1,58 @@
 #
-#  Copyright 2014 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #  SPDX-License-Identifier: Apache-2.0
 
-require 'open-uri'
-require 'rexml/document'
+require "open-uri"
+require "rexml/document"
 
 SAMPLES_DIR = File.dirname(__FILE__)
-JAR_DIR = File.join(SAMPLES_DIR, 'jars')
+JAR_DIR = File.join(SAMPLES_DIR, "jars")
 directory JAR_DIR
 
 def get_maven_jar_info(group_id, artifact_id, version)
   jar_name = "#{artifact_id}-#{version}.jar"
-  jar_url = "https://repo1.maven.org/maven2/#{group_id.gsub(/\./, '/')}/#{artifact_id}/#{version}/#{jar_name}"
+  jar_url = "https://repo1.maven.org/maven2/#{group_id.gsub(/\./, "/")}/#{artifact_id}/#{version}/#{jar_name}"
   local_jar_file = File.join(JAR_DIR, jar_name)
   [jar_name, jar_url, local_jar_file]
 end
 
-def download_maven_jar(group_id, artifact_id, version)
-  jar_name, jar_url, local_jar_file = get_maven_jar_info(group_id, artifact_id, version)
-  open(jar_url) do |remote_jar|
-    open(local_jar_file, 'w') do |local_jar|
-      IO.copy_stream(remote_jar, local_jar)
+def download_maven_jar(jar_url, local_jar_file)
+  begin
+    URI.open(jar_url) do |remote_jar|
+      open(local_jar_file, "w") do |local_jar|
+        IO.copy_stream(remote_jar, local_jar)
+      end
     end
+  rescue OpenURI::HTTPError => error
+    abort("Unable to download from URI #{jar_url} with error #{error.io.status}")
   end
 end
 
-maven_pom_file = REXML::Document.new(File.new("../pom.xml"))
-MAVEN_PACKAGES = Array.new
-maven_pom_file.elements.each("*/dependencies/dependency") do |e|
-  MAVEN_PACKAGES << ["groupId", "artifactId", "version"].map { |attr| e.elements[attr].text }
-end
-
+desc "Run KCL package downloader to fetch dependent maven packages"
 task :download_jars => [JAR_DIR]
 
+common_versions = {}
+maven_pom_file = REXML::Document.new(File.new("../pom.xml"))
+maven_pom_file.elements.each("*/properties/*") do |property|
+  common_versions["${#{property.name}}"] = property.text
+end
+
+MAVEN_PACKAGES = []
+maven_pom_file.elements.each("*/dependencies/dependency") do |e|
+  MAVEN_PACKAGES << ["groupId", "artifactId"].map { |attr| e.elements[attr].text }
+  version = e.elements["version"].text
+  if common_versions.key?(version)
+    MAVEN_PACKAGES.last << common_versions[version]
+  else
+    MAVEN_PACKAGES.last << version
+  end
+end
+
 MAVEN_PACKAGES.each do |jar|
-  _, _, local_jar_file = get_maven_jar_info(*jar)
+  _, jar_url, local_jar_file = get_maven_jar_info(*jar)
   file local_jar_file do
     puts "Downloading '#{local_jar_file}' from maven..."
-    download_maven_jar(*jar)
+    download_maven_jar(jar_url, local_jar_file)
   end
   task :download_jars => local_jar_file
 end
@@ -46,24 +61,24 @@ desc "Run KCL sample producer to generate sample data"
 task :run_producer do |t|
   puts "Running the Kinesis sample producer application..."
   commands = %W(
-  #{SAMPLES_DIR}/sample_kcl_producer.rb
+    #{SAMPLES_DIR}/sample_kcl_producer.rb
   )
   sh *commands
 end
 
 desc "Run KCL sample processor"
 task :run => :download_jars do |t|
-  java_home = ENV['JAVA_HOME']
+  java_home = ENV["JAVA_HOME"]
   fail "JAVA_HOME environment variable not set." unless java_home
-  properties_file = ENV['properties_file']
+  properties_file = ENV["properties_file"]
   unless properties_file
     fail "Properties file not provided. Use \"rake run properties_file=<PATH_TO_FILE> to provide it.\""
   end
-  log_configuration = ENV['log_configuration']
+  log_configuration = ENV["log_configuration"]
   puts "Running the Kinesis sample processing application..."
-  classpath = FileList["#{JAR_DIR}/*.jar"].join(':')
+  classpath = FileList["#{JAR_DIR}/*.jar"].join(":")
   classpath += ":#{SAMPLES_DIR}"
-  ENV['PATH'] = "#{ENV['PATH']}:#{SAMPLES_DIR}"
+  ENV["PATH"] = "#{ENV["PATH"]}:#{SAMPLES_DIR}"
 
   command = "#{java_home}/bin/java -classpath #{classpath} software.amazon.kinesis.multilang.MultiLangDaemon --properties-file #{properties_file}"
   command = "#{command} --log-configuration #{log_configuration}" if log_configuration
