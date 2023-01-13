@@ -187,6 +187,9 @@ all languages.
 
 ## Release Notes
 
+### Release 2.1.0 (January 12, 2023)
+* Upgraded to use version 2.4.4 of the [Amazon Kinesis Client library][amazon-kcl-github]
+
 ### Release 2.0.0 (February 26, 2019)
 * Added support for [Enhanced Fan-Out](https://aws.amazon.com/blogs/aws/kds-enhanced-fanout/).  
   Enhanced Fan-Out provides dedicated throughput per stream consumer, and uses an HTTP/2 push API (SubscribeToShard) to deliver records with lower latency.
