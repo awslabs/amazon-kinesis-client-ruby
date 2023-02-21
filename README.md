@@ -187,6 +187,9 @@ all languages.
 
 ## Release Notes
 
+### Release 2.1.1 (February 21, 2023)
+* [#69](https://github.com/awslabs/amazon-kinesis-client-ruby/pull/69) Include `pom.xml` in the gemspec
+
 ### Release 2.1.0 (January 12, 2023)
 * Upgraded to use version 2.4.4 of the [Amazon Kinesis Client library][amazon-kcl-github]
 
