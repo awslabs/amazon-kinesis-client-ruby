@@ -233,7 +233,7 @@
         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
-            <version>3.21.5</version>
+            <version>3.21.7</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -351,4 +351,4 @@
             <version>3.2.2</version>
         </dependency>
     </dependencies>
-</project> 
+</project>
