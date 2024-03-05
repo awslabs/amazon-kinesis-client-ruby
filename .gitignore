@@ -20,6 +20,7 @@
 /_yardoc/
 /doc/
 /rdoc/
+/Gemfile.lock
 
 ## Environment normalization:
 /.bundle/
