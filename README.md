@@ -11,38 +11,38 @@ This package wraps and manages the interaction with the [MultiLangDaemon][multi-
 executable. A record processor in Ruby typically looks something like:
 
 ```ruby
-    #! /usr/bin/env ruby
+#! /usr/bin/env ruby
 
-    require 'aws/kclrb'
+require 'aws/kclrb'
 
-    class SampleRecordProcessor < Aws::KCLrb::V2::RecordProcessorBase
-      def init_processor(initialize_input)
-        # initialize
-      end
+class SampleRecordProcessor < Aws::KCLrb::V2::RecordProcessorBase
+  def init_processor(initialize_input)
+    # initialize
+  end
 
-      def process_records(process_records_input)
-        # process batch of records
-      end
+  def process_records(process_records_input)
+    # process batch of records
+  end
 
-      def lease_lost(lease_lost_input)
-        # lease was lost, cleanup
-      end
+  def lease_lost(lease_lost_input)
+    # lease was lost, cleanup
+  end
 
-      def shard_ended(shard_ended_input)
-        # shard has ended, cleanup
-      end
+  def shard_ended(shard_ended_input)
+    # shard has ended, cleanup
+  end
 
-      def shutdown_requested(shutdown_requested_input)
-        # shutdown has been requested
-      end
-    end
+  def shutdown_requested(shutdown_requested_input)
+    # shutdown has been requested
+  end
+end
 
-    if __FILE__ == $0
-      # Start the main processing loop
-      record_processor = SampleRecordProcessor.new
-      driver = Aws::KCLrb::KCLProcess.new(record_processor)
-      driver.run
-    end
+if __FILE__ == $0
+  # Start the main processing loop
+  record_processor = SampleRecordProcessor.new
+  driver = Aws::KCLrb::KCLProcess.new(record_processor)
+  driver.run
+end
 ```
 
 ## Before You Get Started
@@ -94,11 +94,11 @@ To run the data producer, run the following commands:
 
 #### Notes
 
-* The [AWS Ruby SDK gem][aws-ruby-sdk-gem] needs to be installed as a pre-requisite. To install,
+* The [AWS Ruby SDK gem][aws-ruby-sdk-gem] for Kinesis needs to be installed as a pre-requisite. To install,
   run:
 
   ```sh
-      sudo gem install aws-sdk
+      sudo gem install aws-sdk-kinesis
   ```
 
 * The script `samples/sample_kcl_producer.rb` takes several parameters that you can use
@@ -187,6 +187,9 @@ all languages.
 
 ## Release Notes
 
+### Release 2.1.1 (February 21, 2023)
+* [#69](https://github.com/awslabs/amazon-kinesis-client-ruby/pull/69) Include `pom.xml` in the gemspec
+
 ### Release 2.1.0 (January 12, 2023)
 * Upgraded to use version 2.4.4 of the [Amazon Kinesis Client library][amazon-kcl-github]
 
@@ -229,7 +232,7 @@ all languages.
 [amazon-kcl]: http://docs.aws.amazon.com/kinesis/latest/dev/kinesis-record-processor-app.html
 [amazon-kcl-github]: https://github.com/awslabs/amazon-kinesis-client
 [amazon-kinesis-python-github]: https://github.com/awslabs/amazon-kinesis-client-python
-[multi-lang-daemon]: https://github.com/awslabs/amazon-kinesis-client/blob/master/src/main/java/com/amazonaws/services/kinesis/multilang/package-info.java
+[multi-lang-daemon]: https://github.com/awslabs/amazon-kinesis-client/blob/master/amazon-kinesis-client-multilang/src/main/java/software/amazon/kinesis/multilang/package-info.java
 [DefaultAWSCredentialsProviderChain]: http://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/auth/DefaultAWSCredentialsProviderChain.html
 [kinesis-forum]: http://developer.amazonwebservices.com/connect/forum.jspa?forumID=169
 [aws-ruby-sdk-gem]: https://rubygems.org/gems/aws-sdk

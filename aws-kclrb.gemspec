@@ -7,11 +7,14 @@ Gem::Specification.new do |spec|
   spec.author          = 'Amazon Web Services'
   spec.files           = Dir['lib/**/*.rb'] 
   spec.files          += Dir['spec/**/*.rb']
-  spec.files          += ['README.md', 'LICENSE.txt', 'VERSION', 'NOTICE.txt', '.yardopts', '.rspec']
+  spec.files          += ['README.md', 'LICENSE.txt', 'VERSION', 'NOTICE.txt', '.yardopts', '.rspec', 'pom.xml']
   spec.licenses         = ['Apache-2.0']
   spec.platform        = Gem::Platform::RUBY
   spec.homepage        = 'http://github.com/aws/amazon-kinesis-client-ruby'
   spec.require_paths   = ['lib']
 
   spec.add_dependency('multi_json', '~> 1.0')
+
+  spec.add_development_dependency "rspec"
+  spec.add_development_dependency "simplecov"
 end

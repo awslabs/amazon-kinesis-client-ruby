@@ -52,8 +52,8 @@ module Aws
       # @param action [Hash] A hash that represents an action to take with
       #   appropriate attributes, as retrieved from {IOProxy#read_action}, e.g.
       #
-      #   - `{"action":"initialize","shardId":"shardId-123"}`
-      #   - `{"action":"processRecords","records":[{"data":"bWVvdw==","partitionKey":"cat","sequenceNumber":"456"}]}`
+      #   - `{"action":"initialize","shardId":"shardId-123","sequenceNumber":123}`
+      #   - `{"action":"processRecords","records":[{"data":"bWVvdw==","partitionKey":"cat","sequenceNumber":"456"}],"millisBehindLatest":"0"}`
       #   - `{"action":"shutdown","reason":"TERMINATE"}`
       # @raise [MalformedAction] if the action is missing expected attributes.
       def process_action(action)
