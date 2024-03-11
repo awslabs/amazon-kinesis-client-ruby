@@ -232,7 +232,7 @@ all languages.
 [amazon-kcl]: http://docs.aws.amazon.com/kinesis/latest/dev/kinesis-record-processor-app.html
 [amazon-kcl-github]: https://github.com/awslabs/amazon-kinesis-client
 [amazon-kinesis-python-github]: https://github.com/awslabs/amazon-kinesis-client-python
-[multi-lang-daemon]: https://github.com/awslabs/amazon-kinesis-client/blob/master/src/main/java/com/amazonaws/services/kinesis/multilang/package-info.java
+[multi-lang-daemon]: https://github.com/awslabs/amazon-kinesis-client/blob/master/amazon-kinesis-client-multilang/src/main/java/software/amazon/kinesis/multilang/package-info.java
 [DefaultAWSCredentialsProviderChain]: http://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/auth/DefaultAWSCredentialsProviderChain.html
 [kinesis-forum]: http://developer.amazonwebservices.com/connect/forum.jspa?forumID=169
 [aws-ruby-sdk-gem]: https://rubygems.org/gems/aws-sdk
