@@ -60,8 +60,8 @@ access.
 For questions regarding [Amazon Kinesis Service][amazon-kinesis] and the client libraries please check the
 [official documentation][amazon-kinesis-docs] as well as the [Amazon Kinesis Forums][kinesis-forum].
 
-## 🚨Important: Migration to KCL 2.7 or later with MultiLangDaemon - Credential Provider Changes Required
-KCL version 2.7.0 and later uses AWS SDK for Java 2.x instead of AWS SDK for Java 1.x. All MultiLangDaemon users
+## 🚨Important: Migration to amazon-kinesis-client-ruby 2.2.0 or later with MultiLangDaemon - Credential Provider Changes Required
+amazon-kinesis-client-ruby version 2.2.0 and later depends on KCL version 2.7.0, which uses AWS SDK for Java 2.x instead of AWS SDK for Java 1.x. All MultiLangDaemon users
 upgrading from earlier versions must update their credential provider configuration in the `.properties` file to use
 credentials provider name for AWS SDK for Java 2.x. Failure to do this will cause your multilang KCL application to fail
 during startup with credential provider construction errors. Please check the following link for the credentials
