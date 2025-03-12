@@ -51,7 +51,7 @@ Before running the samples, you'll want to make sure that your environment is
 configured to allow the samples to use your
 [AWS Security Credentials](http://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html).
 
-By default the samples use the [DefaultAWSCredentialsProviderChain][DefaultAWSCredentialsProviderChain]
+By default the samples use the [DefaultCredentialsProvider][DefaultCredentialsProvider]
 so you'll want to make your credentials available to one of the credentials providers in that
 provider chain. There are several ways to do this such as providing a `~/.aws/credentials` file,
 or if you're running on Amazon EC2, you can associate an IAM role with your instance with appropriate
@@ -59,6 +59,16 @@ access.
 
 For questions regarding [Amazon Kinesis Service][amazon-kinesis] and the client libraries please check the
 [official documentation][amazon-kinesis-docs] as well as the [Amazon Kinesis Forums][kinesis-forum].
+
+## 🚨Important: Migration to KCL 2.7 or later with MultiLangDaemon - Credential Provider Changes Required
+KCL version 2.7.0 and later uses AWS SDK for Java 2.x instead of AWS SDK for Java 1.x. All MultiLangDaemon users
+upgrading from earlier versions must update their credential provider configuration in the `.properties` file to use
+credentials provider name for AWS SDK for Java 2.x. Failure to do this will cause your multilang KCL application to fail
+during startup with credential provider construction errors. Please check the following link for the credentials
+provider mapping and MultiLangDaemon credentials provider configuration guide.
+
+- [AWS SDK for Java 1.x to 2.x Credentials Provider Mapping](aws.amazon.com/sdk-for-java/latest/developer-guide/migration-client-credentials.html#credentials-changes-mapping)
+- [KCL Multilang Credentials Provider Configuration Guide](https://github.com/aws/amazon-kinesis-client/blob/master/docs/multilang/configuring-credential-providers.md)
 
 ## Running the Sample
 
@@ -186,6 +196,13 @@ all languages.
 * The [Amazon Kinesis Forum][kinesis-forum]
 
 ## Release Notes
+### Release 2.2.0 (2025-03-12)
+* [#1444](https://github.com/awslabs/amazon-kinesis-client/pull/1444) Fully remove dependency on the AWS SDK for Java 1.x which will reach [end-of-support by December 31st, 2025](https://aws.amazon.com/blogs/developer/announcing-end-of-support-for-aws-sdk-for-java-v1-x-on-december-31-2025/).
+  * The Glue Schema Registry integration functionality no longer depends on AWS SDK for Java 1.x. Previously, it required this as a transient dependency.
+  * Multilangdaemon has been upgraded to use AWS SDK for Java 2.x. It no longer depends on AWS SDK for Java 1.x.
+* [#89](https://github.com/awslabs/amazon-kinesis-client-ruby/pull/89) Upgrade logback.version from 1.3.14 to 1.5.16
+* [#89](https://github.com/awslabs/amazon-kinesis-client-ruby/pull/89) Upgrade netty.version from 4.1.108.Final to 4.1.118.Final
+
 ### Release 2.1.2 (January 22, 2025)
 * Upgraded to use version 2.6.1 of the [Amazon Kinesis Client library](https://github.com/awslabs/amazon-kinesis-client/blob/v2.6.1/CHANGELOG.md#release-261-2024-12-13).
 
@@ -235,7 +252,7 @@ all languages.
 [amazon-kcl-github]: https://github.com/awslabs/amazon-kinesis-client
 [amazon-kinesis-python-github]: https://github.com/awslabs/amazon-kinesis-client-python
 [multi-lang-daemon]: https://github.com/awslabs/amazon-kinesis-client/blob/master/src/main/java/com/amazonaws/services/kinesis/multilang/package-info.java
-[DefaultAWSCredentialsProviderChain]: http://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/auth/DefaultAWSCredentialsProviderChain.html
+[DefaultCredentialsProvider]: https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/auth/credentials/DefaultCredentialsProvider.html
 [kinesis-forum]: http://developer.amazonwebservices.com/connect/forum.jspa?forumID=169
 [aws-ruby-sdk-gem]: https://rubygems.org/gems/aws-sdk
 
