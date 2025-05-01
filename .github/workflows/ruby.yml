@@ -61,3 +61,8 @@ jobs:
       - name: Install required gems
         run: |
           sudo gem install aws-sdk-kinesis
+
+      - name: Running data producer
+        run: |
+          cd samples
+          rake run_producer
