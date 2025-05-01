@@ -56,12 +56,11 @@ jobs:
 
       - name: Run tests
         run: |
+          bundle install
           bundle exec rspec
 
       - name: Install required gems
         run: |
-          bundle install
-          gem install bundler
           gem install rake
           gem install aws-sdk-kinesis
 
