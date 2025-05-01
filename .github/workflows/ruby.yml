@@ -5,31 +5,52 @@
 # This workflow will download a prebuilt Ruby version, install dependencies and run tests with Rake
 # For more information see: https://github.com/marketplace/actions/setup-ruby-jruby-and-truffleruby
 
-name: Ruby
-
+name: Sample Run
 on:
   push:
-    branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
 
 permissions:
+  id-token: write
   contents: read
 
 jobs:
-  test:
+  sample-run:
+    timeout-minutes: 8
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
 
-    runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        ruby-version: ['2.6', '2.7', '3.0']
+        ruby-version: [ '2.6', '2.7', '3.0' ]
+        jdk-version: [ "8", "11", "17", "21", "24" ]
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout working directory
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: us-east-1
+          role-to-assume: arn:aws:iam::751999266872:role/GitHubWorkflows
+          role-session-name: myGitHubActions
+
+      - name: Set up JDK ${{ matrix.jdk-version }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ matrix.jdk-version }}
+          distribution: 'corretto'
+
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby-version }}
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
+
       - name: Run tests
         run: bundle exec rspec
