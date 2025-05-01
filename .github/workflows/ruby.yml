@@ -53,7 +53,6 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby-version }}
-          bundler-cache: true # runs 'bundle install' and caches installed gems automatically
 
       - name: Run tests
         run: |
@@ -61,8 +60,10 @@ jobs:
 
       - name: Install required gems
         run: |
+          bundle install
+          gem install bundler
           gem install rake
-          sudo gem install aws-sdk-kinesis
+          gem install aws-sdk-kinesis
 
       - name: Running data producer
         run: |
