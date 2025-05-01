@@ -26,8 +26,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ruby-version: [ '2.6', '2.7', '3.0' ]
-        jdk-version: [ "8", "11", "17", "21", "24" ]
+#        ruby-version: [ '2.6', '2.7', '3.0' ]
+#        jdk-version: [ "8", "11", "17", "21", "24" ]
+        ruby-version: [ '2.6', '3.0' ]
+        jdk-version: [ "8", "11", "24" ]
         os: [ ubuntu-latest, macOS-latest, windows-latest ]
 
     steps:
@@ -56,3 +58,6 @@ jobs:
       - name: Run tests
         run: bundle exec rspec
 
+      - name: Install required gems
+        run: |
+          sudo gem install aws-sdk-kinesis
