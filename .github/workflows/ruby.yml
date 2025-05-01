@@ -56,8 +56,14 @@ jobs:
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
 
       - name: Run tests
-        run: bundle exec rspec
+        run: |
+          bundle exec rspec
 
       - name: Install required gems
         run: |
           gem install aws-sdk-kinesis
+
+      - name: Running data producer
+        run: |
+          cd samples
+          rake run_producer
