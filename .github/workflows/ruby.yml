@@ -61,6 +61,7 @@ jobs:
 
       - name: Install required gems
         run: |
+          gem install rake
           gem install aws-sdk-kinesis
 
       - name: Running data producer
