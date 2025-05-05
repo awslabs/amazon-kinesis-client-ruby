@@ -16,18 +16,19 @@ class SampleProducer
     @kinesis = service
   end
 
-  def run(timeout=0)
-    create_stream_if_not_exists
-    start = Time.now
+def run(timeout=0)
+  create_stream_if_not_exists
+  start = Time.now
 
-    loop do
-        put_record
-        if timeout > 0 && (Time.now - start) >= timeout
-            puts "\nReached desired runtime of #{timeout} seconds. Exiting."
-            break
-        end
+  loop do
+    put_record
+    if timeout > 0 && (Time.now - start) >= timeout
+      puts "\nReached desired runtime of #{timeout} seconds. Exiting."
+      break
+    end
     sleep @sleep_between_puts
   end
+end
 
   def delete_stream_if_exists
     begin
