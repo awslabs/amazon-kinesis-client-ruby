@@ -19,10 +19,14 @@ class SampleProducer
   def run(timeout=0)
     create_stream_if_not_exists
     start = Time.now
-    while (timeout == 0 || (Time.now - start) < timeout)
-      put_record
-      sleep @sleep_between_puts
-    end
+
+    loop do
+        put_record
+        if timeout > 0 && (Time.now - start) >= timeout
+            puts "\nReached desired runtime of #{timeout} seconds. Exiting."
+            break
+        end
+    sleep @sleep_between_puts
   end
 
   def delete_stream_if_exists
