@@ -16,19 +16,14 @@ class SampleProducer
     @kinesis = service
   end
 
-def run(timeout=0)
-  create_stream_if_not_exists
-  start = Time.now
-
-  loop do
-    put_record
-    if timeout > 0 && (Time.now - start) >= timeout
-      puts "\nReached desired runtime of #{timeout} seconds. Exiting."
-      break
+  def run(timeout=0)
+    create_stream_if_not_exists
+    start = Time.now
+    while (timeout == 0 || (Time.now - start) < timeout)
+      put_record
+      sleep @sleep_between_puts
     end
-    sleep @sleep_between_puts
   end
-end
 
   def delete_stream_if_exists
     begin
@@ -116,7 +111,7 @@ if __FILE__ == $0
       raise OptionParser::ParseError.new("SLEEP_SECONDS must be a non-negative number")  unless sleep_between_puts >= 0.0
     end
     opts.on("-t TIMEOUT_SECONDS", "--timeout TIMEOUT_SECONDS", Float, "How long to keep running. By default producer keeps running indefinitely. (Default: #{timeout})") do |t|
-      timeout = t.to_f
+      timeout = t
       raise OptionParser::ParseError.new("TIMEOUT_SECONDS must be a non-negative number")  unless timeout >= 0.0
     end
     opts.on("-h", "--help", "Prints this help message.") do
