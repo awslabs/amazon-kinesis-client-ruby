@@ -92,7 +92,7 @@ if __FILE__ == $0
   aws_region = nil
   stream_name = 'kclrbsample'
   shard_count = nil
-  sleep_between_puts = 0.25
+  sleep_between_puts = 1
   timeout = 0
   # Get and parse options
   option_parser = OptionParser.new do |opts|
