@@ -60,7 +60,7 @@ end
 desc "Run KCL sample producer to generate sample data"
 task :run_producer, [:timeout] do |t, args|
   puts "Running the Kinesis sample producer application..."
-  timeout = args[:timeout] || 0do
+  timeout = args[:timeout] || 0
   command = "#{SAMPLES_DIR}/sample_kcl_producer.rb"
 
   if timeout != 0
