@@ -5,15 +5,16 @@
 # This workflow will download a prebuilt Ruby version, install dependencies and run tests with Rake
 # For more information see: https://github.com/marketplace/actions/setup-ruby-jruby-and-truffleruby
 
-name: Sample Run
+name: Sample Run and Dependabot Auto-merge
 on:
   push:
-  pull_request:
+  pull_request_target:
     branches: [ "master" ]
+  workflow_dispatch: ]
 
 permissions:
   id-token: write
-  contents: read
+  contents: write
 
 jobs:
   sample-run:
