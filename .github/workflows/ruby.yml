@@ -66,4 +66,4 @@ jobs:
 
       - name: Running data producer
         run: |
-          ruby samples/sample_kcl_producer.rb -t 10
+          rake "run_producer[10]"
