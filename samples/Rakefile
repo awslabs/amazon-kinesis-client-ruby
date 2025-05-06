@@ -91,6 +91,7 @@ task :run => :download_jars do |t|
     classpath = FileList["#{JAR_DIR}/*.jar"].join(":")
     classpath += ":#{SAMPLES_DIR}"
     ENV["PATH"] = "#{ENV["PATH"]}:#{SAMPLES_DIR}"
+  end
 
   command = "#{java_home}/bin/java -classpath #{classpath} software.amazon.kinesis.multilang.MultiLangDaemon --properties-file #{properties_file}"
   command = "#{command} --log-configuration #{log_configuration}" if log_configuration
