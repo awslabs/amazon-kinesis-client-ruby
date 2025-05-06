@@ -72,12 +72,20 @@ jobs:
           gem install rake
           gem install aws-sdk-kinesis
 
-      - name: Running data producer
+      - name: Running KCL producer
         run: |
           cd samples
           rake "run_producer[10]"
 
-      - name: Running data consumer
+      - name: Running KCL consumer (windows or ubuntu)
+        if: ${{ matrix.os != 'macOS-latest'}}
         run: |
           cd samples
-          rake run properties_file=sample.properties
+          timeout 45 rake run properties_file=sample.properties
+
+      - name: Running KCL consumer (macOS)
+        if: ${{ matrix.os == 'macOS-latest'}}
+        run: |
+          brew install coreutils
+          cd samples
+          gtimeout 45 rake run properties_file=sample.properties
