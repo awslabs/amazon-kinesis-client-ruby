@@ -61,7 +61,13 @@ jobs:
           bundle update --bundler
           bundle exec rspec
 
-      - name: Install required gems
+      - name: Install required gems (windows)
+        if: ${{ matrix.os == 'windows-latest' }}
+        run: |
+          gem install aws-sdk-kinesis
+
+      - name: Install required gems (ubuntu and macOS)
+        if: ${{ matrix.os != 'windows-latest' }}
         run: |
           gem install rake
           gem install aws-sdk-kinesis
