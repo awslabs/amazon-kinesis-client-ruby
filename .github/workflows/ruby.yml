@@ -81,11 +81,11 @@ jobs:
         if: ${{ matrix.os != 'macOS-latest'}}
         run: |
           cd samples
-          timeout 45 rake run properties_file=sample.properties
+          timeout 45 rake run properties_file=sample.properties || status="$?"; if (( status == 124 )); then exit 0; else exit 1; fi; exit "$status"
 
       - name: Running KCL consumer (macOS)
         if: ${{ matrix.os == 'macOS-latest'}}
         run: |
           brew install coreutils
           cd samples
-          gtimeout 45 rake run properties_file=sample.properties
+          gtimeout 45 rake run properties_file=sample.properties || status="$?"; if (( status == 124 )); then exit 0; else exit 1; fi; exit "$status"
