@@ -78,11 +78,19 @@ task :run => :download_jars do |t|
   unless properties_file
     fail "Properties file not provided. Use \"rake run properties_file=<PATH_TO_FILE> to provide it.\""
   end
-  log_configuration = ENV["log_configuration"]
-  puts "Running the Kinesis sample processing application..."
-  classpath = FileList["#{JAR_DIR}/*.jar"].join(":")
-  classpath += ":#{SAMPLES_DIR}"
-  ENV["PATH"] = "#{ENV["PATH"]}:#{SAMPLES_DIR}"
+
+  if Gem.win_platform?
+    log_configuration = ENV["log_configuration"]
+    puts "Running the Kinesis sample processing application..."
+    classpath = FileList["#{JAR_DIR}/*.jar"].join(";")
+    classpath += ";#{SAMPLES_DIR}"
+    ENV["PATH"] = "#{ENV["PATH"]};#{SAMPLES_DIR}"
+  else
+    log_configuration = ENV["log_configuration"]
+    puts "Running the Kinesis sample processing application..."
+    classpath = FileList["#{JAR_DIR}/*.jar"].join(":")
+    classpath += ":#{SAMPLES_DIR}"
+    ENV["PATH"] = "#{ENV["PATH"]}:#{SAMPLES_DIR}"
 
   command = "#{java_home}/bin/java -classpath #{classpath} software.amazon.kinesis.multilang.MultiLangDaemon --properties-file #{properties_file}"
   command = "#{command} --log-configuration #{log_configuration}" if log_configuration
