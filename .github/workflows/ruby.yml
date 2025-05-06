@@ -76,3 +76,8 @@ jobs:
         run: |
           cd samples
           rake "run_producer[10]"
+
+      - name: Running data consumer
+        run: |
+          cd samples
+          rake run properties_file=sample.properties
