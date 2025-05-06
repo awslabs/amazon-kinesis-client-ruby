@@ -68,4 +68,5 @@ jobs:
 
       - name: Running data producer
         run: |
+          cd samples
           rake "run_producer[10]"
