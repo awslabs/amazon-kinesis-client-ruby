@@ -66,5 +66,4 @@ jobs:
 
       - name: Running data producer
         run: |
-          cd samples
-          rake run_producer -h
+          ruby samples/sample_kcl_producer.rb -t 10
