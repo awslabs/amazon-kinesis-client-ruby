@@ -85,12 +85,20 @@ The following defaults are used in the sample application:
 
 ### Running the Data Producer
 
-To run the data producer, run the following commands:
+To run the data producer indefinitely, run the following commands:
 
 ```sh
     cd samples
     rake run_producer
 ```
+
+To run the data producer with a timeout, run the following commands:
+
+```sh
+    cd samples
+    rake "run_producer[t]"
+```
+* *note: replace t with number of seconds to run the producer*
 
 #### Notes
 

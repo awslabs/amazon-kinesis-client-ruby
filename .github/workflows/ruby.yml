@@ -5,31 +5,101 @@
 # This workflow will download a prebuilt Ruby version, install dependencies and run tests with Rake
 # For more information see: https://github.com/marketplace/actions/setup-ruby-jruby-and-truffleruby
 
-name: Ruby
-
+name: Sample Run and Dependabot Auto-merge
 on:
-  push:
-    branches: [ "master" ]
-  pull_request:
+  pull_request_target:
     branches: [ "master" ]
 
 permissions:
-  contents: read
+  id-token: write
+  contents: write
 
 jobs:
-  test:
+  sample-run:
+    timeout-minutes: 8
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
 
-    runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        ruby-version: ['2.6', '2.7', '3.0']
+        ruby-version: [ '3.0', '3.4' ]
+        jdk-version: [ "8", "11",  "17", "21", "24" ]
+        os: [ ubuntu-latest, macOS-latest, windows-latest ]
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout working directory
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: us-east-1
+          role-to-assume: arn:aws:iam::751999266872:role/GitHubWorkflows
+          role-session-name: myGitHubActions
+
+      - name: Set up JDK ${{ matrix.jdk-version }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ matrix.jdk-version }}
+          distribution: 'corretto'
+
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby-version }}
-          bundler-cache: true # runs 'bundle install' and caches installed gems automatically
-      - name: Run tests
-        run: bundle exec rspec
+
+      - name: Install Bundler and run tests
+        run: |
+          gem install bundler
+          bundle install
+          bundle update --bundler
+          bundle exec rspec
+
+      - name: Install Rake (ubuntu and macOS)
+        if: ${{ matrix.os != 'windows-latest' }}
+        run: |
+          gem install rake
+
+      - name: Install Kinesis SDK
+        run: |
+          gem install aws-sdk-kinesis
+
+      - name: Running KCL producer
+        run: |
+          cd samples
+          rake "run_producer[10]"
+
+      - name: Running KCL consumer (windows or ubuntu)
+        if: ${{ matrix.os != 'macOS-latest'}}
+        run: |
+          cd samples
+          timeout 45 rake run properties_file=sample.properties || status="$?"; if (( status == 124 )); then exit 0; else exit 1; fi; exit "$status"
+
+      - name: Running KCL consumer (macOS)
+        if: ${{ matrix.os == 'macOS-latest'}}
+        run: |
+          brew install coreutils
+          cd samples
+          gtimeout 45 rake run properties_file=sample.properties || status="$?"; if (( status == 124 )); then exit 0; else exit 1; fi; exit "$status"
+
+  auto-merge-dependabot:
+    needs: [sample-run]
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.user.login == 'dependabot[bot]'
+    steps:
+      - name: Fetch Dependabot metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@v2
+        with:
+          alert-lookup: true
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+      - name: Enable auto-merge for Dependabot PRs
+        if: steps.metadata.outputs.update-type != 'version-update:semver-major'
+        run: gh pr merge --auto --merge "$PR_URL"
+        env:
+          PR_URL: ${{github.event.pull_request.html_url}}
+          GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+

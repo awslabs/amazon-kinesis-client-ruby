@@ -92,7 +92,7 @@ if __FILE__ == $0
   aws_region = nil
   stream_name = 'kclrbsample'
   shard_count = nil
-  sleep_between_puts = 0.25
+  sleep_between_puts = 1
   timeout = 0
   # Get and parse options
   option_parser = OptionParser.new do |opts|
@@ -111,7 +111,7 @@ if __FILE__ == $0
       raise OptionParser::ParseError.new("SLEEP_SECONDS must be a non-negative number")  unless sleep_between_puts >= 0.0
     end
     opts.on("-t TIMEOUT_SECONDS", "--timeout TIMEOUT_SECONDS", Float, "How long to keep running. By default producer keeps running indefinitely. (Default: #{timeout})") do |t|
-      timeout = t.to_f
+      timeout = Float(t)
       raise OptionParser::ParseError.new("TIMEOUT_SECONDS must be a non-negative number")  unless timeout >= 0.0
     end
     opts.on("-h", "--help", "Prints this help message.") do

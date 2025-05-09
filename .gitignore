@@ -11,6 +11,7 @@
 /tmp/
 /samples/jars
 /.idea
+.idea
 
 # Used by dotenv library to load environment variables.
 # .env
