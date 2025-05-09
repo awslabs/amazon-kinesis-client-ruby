@@ -51,22 +51,20 @@ jobs:
         with:
           ruby-version: ${{ matrix.ruby-version }}
 
-      - name: Run tests
+      - name: Install Bundler and run tests
         run: |
           gem install bundler
           bundle install
           bundle update --bundler
           bundle exec rspec
 
-      - name: Install required gems (windows)
-        if: ${{ matrix.os == 'windows-latest' }}
-        run: |
-          gem install aws-sdk-kinesis
-
-      - name: Install required gems (ubuntu and macOS)
+      - name: Install Rake (ubuntu and macOS)
         if: ${{ matrix.os != 'windows-latest' }}
         run: |
           gem install rake
+
+      - name: Install Kinesis SDK
+        run: |
           gem install aws-sdk-kinesis
 
       - name: Running KCL producer
