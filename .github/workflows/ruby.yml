@@ -8,9 +8,9 @@
 name: Sample Run Tests and Dependabot
 on:
   push:
-    branches: [ master, sample-improve ]
+    branches: [ master ]
   pull_request_target:
-    branches: [ master, sample-improve ]
+    branches: [ master ]
     types: [opened, synchronize, reopened, unlabeled]
 
 concurrency:
@@ -103,7 +103,7 @@ jobs:
           echo "STREAM_NAME=$STREAM_NAME" >> $GITHUB_ENV
           echo "APP_NAME=$APP_NAME" >> $GITHUB_ENV
 
-      # Manipulate sample.properties file to use unique stream name and application name
+      # Manipulate sample.properties file to use unique stream name, application name, and OS specific program changes
       - name: Manipulate sample.properties file
         run: |
           chmod +x .github/scripts/manipulate_properties.sh
@@ -160,6 +160,9 @@ jobs:
     needs: [sample-run]
     runs-on: ubuntu-latest
     if: github.actor == 'dependabot[bot]' && github.event.pull_request.user.login == 'dependabot[bot]'
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - name: Fetch Dependabot metadata
         id: metadata
@@ -168,12 +171,12 @@ jobs:
           alert-lookup: true
           github-token: "${{ secrets.GITHUB_TOKEN }}"
 
-#      - name: Approve PR
-#        if: steps.metadata.outputs.update-type != 'version-update:semver-major'
-#        run: gh pr review --approve "$PR_URL"
-#        env:
-#          PR_URL: ${{github.event.pull_request.html_url}}
-#          GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      - name: Approve PR
+        if: steps.metadata.outputs.update-type != 'version-update:semver-major'
+        run: gh pr review --approve "$PR_URL"
+        env:
+          PR_URL: ${{github.event.pull_request.html_url}}
+          GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
 #      - name: Enable auto-merge for Dependabot PRs
 #        if: steps.metadata.outputs.update-type != 'version-update:semver-major'
