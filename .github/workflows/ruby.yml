@@ -5,42 +5,76 @@
 # This workflow will download a prebuilt Ruby version, install dependencies and run tests with Rake
 # For more information see: https://github.com/marketplace/actions/setup-ruby-jruby-and-truffleruby
 
-name: Sample Run and Dependabot Auto-merge
+name: Sample Run Tests and Dependabot
 on:
   push:
     branches: [ master ]
+  pull_request_target:
+    branches: [ master ]
+    types: [opened, synchronize, reopened, unlabeled]
 
-permissions:
-  id-token: write
-  contents: write
-  pull-requests: write
-  statuses: write
+concurrency:
+  group: ruby.yml
+  cancel-in-progress: false
 
 jobs:
+  # Evaluates if the sample tests should run. If the workflow is triggered by a push OR
+  # is triggered by a pull request without the 'skip-sample-tests' label, the sample tests should run.
+  # Otherwise, the sample tests will be skipped
+  check-if-should-run:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'push' || (github.event_name == 'pull_request_target' && !contains(github.event.pull_request.labels.*.name, 'skip-sample-tests')) }}
+    outputs:
+      should_run: 'true'
+      is_fork: ${{ github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.fork }}
+    steps:
+      - run: echo "Evaluating workflow conditions"
+
+  # Workflow will pause and wait here if it is triggered by a fork PR. The workflow will continue to wait until
+  # an approved member of the environment 'manual_approval' allows the workflow to run
+  wait-for-approval:
+    needs: [ check-if-should-run ]
+    if: ${{ needs.check-if-should-run.outputs.is_fork == 'true' }}
+    runs-on: ubuntu-latest
+    environment: manual-approval
+    steps:
+      - run: echo "Fork PR approved by a team member."
+
+  # Sample run tests of the KCL
+  # Runs only if (check-if-should-run allows AND (the PR is not from a fork OR it has been approved to run))
   sample-run:
-    timeout-minutes: 8
+    needs: [ check-if-should-run, wait-for-approval ]
+    permissions:
+      id-token: write
+    if: ${{ always() && needs.check-if-should-run.outputs.should_run == 'true' && (needs.check-if-should-run.outputs.is_fork != 'true' || needs.wait-for-approval.result == 'success') }}
+    timeout-minutes: 20
     runs-on: ${{ matrix.os }}
     defaults:
       run:
         shell: bash
 
+    # Initialize matrix based on PR labels (more-tests label runs more tests)
     strategy:
       fail-fast: false
       matrix:
-        ruby-version: [ '3.0', '3.4' ]
-        jdk-version: [ "8", "11",  "17", "21", "24" ]
+        ruby-version: ${{ github.event_name == 'pull_request_target' && contains(github.event.pull_request.labels.*.name, 'more-tests') && fromJSON('["3.0", "3.4"]') || fromJSON('["3.0"]') }}
+        jdk-version: ${{ github.event_name == 'pull_request_target' && contains(github.event.pull_request.labels.*.name, 'more-tests') && fromJSON('["8", "11", "17", "21", "24"]') || fromJSON('["8", "11"]') }}
         os: [ ubuntu-latest, macOS-latest, windows-latest ]
 
     steps:
-      - name: Checkout working directory
+      # For pull_request_target, checkout PR head instead of merge commit
+      - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'pull_request_target' && github.event.pull_request.head.sha || github.ref }}
 
+      # Configure AWS Credentials. Role session name is unique to avoid OIDC errors when running multiple tests concurrently
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: us-east-1
-          role-to-assume: arn:aws:iam::751999266872:role/GitHubRuby
-          role-session-name: myGitHubActionsRuby
+          role-to-assume: ${{ secrets.AWS_ARN_GHA }}
+          role-session-name: GHA-${{ github.run_id }}-${{ matrix.ruby-version }}-${{ matrix.jdk-version }}-${{ matrix.os }}
 
       - name: Set up JDK ${{ matrix.jdk-version }}
         uses: actions/setup-java@v4
@@ -53,44 +87,82 @@ jobs:
         with:
           ruby-version: ${{ matrix.ruby-version }}
 
-      - name: Install Bundler and run tests
+      - name: Install dependencies and run tests
         run: |
-          gem install bundler
+          gem install bundler aws-sdk-kinesis aws-kclrb
+          if [ "${{ matrix.os }}" != "windows-latest" ]; then gem install rake; fi
           bundle install
           bundle update --bundler
           bundle exec rspec
 
-      - name: Install Rake (ubuntu and macOS)
-        if: ${{ matrix.os != 'windows-latest' }}
+      # Create unique identifiers for the stream name and application name
+      - name: Set up unique identifiers
         run: |
-          gem install rake
+          STREAM_NAME="kclrbsample-${{ matrix.os }}-rb${{ matrix.ruby-version }}-jdk${{ matrix.jdk-version }}"
+          APP_NAME="RubyKCLSample-${{ matrix.os }}-rb${{ matrix.ruby-version }}-jdk${{ matrix.jdk-version }}"
+          echo "STREAM_NAME=$STREAM_NAME" >> $GITHUB_ENV
+          echo "APP_NAME=$APP_NAME" >> $GITHUB_ENV
 
-      - name: Install Kinesis SDK
+      # Manipulate sample.properties file to use unique stream name, application name, and OS specific program changes
+      - name: Manipulate sample.properties file
         run: |
-          gem install aws-sdk-kinesis
+          chmod +x .github/scripts/manipulate_properties.sh
+          .github/scripts/manipulate_properties.sh
+        env:
+          RUNNER_OS: ${{ matrix.os }}
+          STREAM_NAME: ${{ env.STREAM_NAME }}
+          APP_NAME: ${{ env.APP_NAME }}
 
-      - name: Running KCL producer
+      # Create kinesis stream with unique name and wait for it to exist
+      - name: Create and wait Kinesis stream
         run: |
-          cd samples
-          rake "run_producer[10]"
+          chmod +x .github/scripts/create_stream.sh
+          .github/scripts/create_stream.sh
+        env:
+          STREAM_NAME: ${{ env.STREAM_NAME }}
 
-      - name: Running KCL consumer (windows or ubuntu)
-        if: ${{ matrix.os != 'macOS-latest'}}
+      # Put words to sample stream with unique name based on run ID
+      - name: Put words to sample stream
         run: |
-          cd samples
-          timeout 45 rake run properties_file=sample.properties || status="$?"; if (( status == 124 )); then exit 0; else exit 1; fi; exit "$status"
+          chmod +x .github/scripts/put_words_to_stream.sh
+          .github/scripts/put_words_to_stream.sh
+        env:
+          STREAM_NAME: ${{ env.STREAM_NAME }}
 
-      - name: Running KCL consumer (macOS)
-        if: ${{ matrix.os == 'macOS-latest'}}
+      # Run sample KCL application
+      - name: Start KCL application
         run: |
-          brew install coreutils
-          cd samples
-          gtimeout 45 rake run properties_file=sample.properties || status="$?"; if (( status == 124 )); then exit 0; else exit 1; fi; exit "$status"
+          chmod +x .github/scripts/start_kcl.sh
+          .github/scripts/start_kcl.sh
+        env:
+          RUNNER_OS: ${{ matrix.os }}
+          STREAM_NAME: ${{ env.STREAM_NAME }}
+
+      # Check and verify results of KCL test
+      - name: Verify KCL Functionality
+        run: |
+          chmod +x .github/scripts/verify_kcl.sh
+          .github/scripts/verify_kcl.sh
+        env:
+          APP_NAME: ${{ env.APP_NAME }}
+
+      # Clean up all existing Streams and DDB tables
+      - name: Clean up Kinesis Stream and DynamoDB table
+        if: always()
+        run: |
+          chmod +x .github/scripts/clean_up_stream_table.sh
+          .github/scripts/clean_up_stream_table.sh
+        env:
+          STREAM_NAME: ${{ env.STREAM_NAME }}
+          APP_NAME: ${{ env.APP_NAME }}
 
   auto-merge-dependabot:
     needs: [sample-run]
     runs-on: ubuntu-latest
     if: github.actor == 'dependabot[bot]' && github.event.pull_request.user.login == 'dependabot[bot]'
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - name: Fetch Dependabot metadata
         id: metadata
@@ -99,12 +171,12 @@ jobs:
           alert-lookup: true
           github-token: "${{ secrets.GITHUB_TOKEN }}"
 
-#      - name: Approve PR
-#        if: steps.metadata.outputs.update-type != 'version-update:semver-major'
-#        run: gh pr review --approve "$PR_URL"
-#        env:
-#          PR_URL: ${{github.event.pull_request.html_url}}
-#          GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      - name: Approve PR
+        if: steps.metadata.outputs.update-type != 'version-update:semver-major'
+        run: gh pr review --approve "$PR_URL"
+        env:
+          PR_URL: ${{github.event.pull_request.html_url}}
+          GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
 #      - name: Enable auto-merge for Dependabot PRs
 #        if: steps.metadata.outputs.update-type != 'version-update:semver-major'
