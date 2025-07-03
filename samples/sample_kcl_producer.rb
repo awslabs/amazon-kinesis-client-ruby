@@ -78,7 +78,7 @@ class SampleProducer
   end
 
   def wait_for_stream_to_become_active
-    sleep_time_seconds = 3
+    sleep_time_seconds = 5
     status = get_stream_description[:stream_status]
     while status && status != 'ACTIVE' do
       puts "#{@stream_name} has status: #{status}, sleeping for #{sleep_time_seconds} seconds"
