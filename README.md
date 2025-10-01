@@ -194,7 +194,7 @@ all languages.
 * The [Amazon Kinesis Forum][kinesis-forum]
 
 ## Release Notes
-### Release 3.0.1 (October 1, 2025)
+### Release 3.1.0 (October 1, 2025)
 * [#108](https://github.com/awslabs/amazon-kinesis-client-ruby/pull/108) Add multi-lang support for leaseAssignmentIntervalMillis
 * [#116](https://github.com/awslabs/amazon-kinesis-client-ruby/pull/116) Upgrade amazon-kinesis-client from 3.0.0 to 3.1.3
 * [#116](https://github.com/awslabs/amazon-kinesis-client-ruby/pull/116) Upgrade aws-sdk from 2.25.64 to 2.33.0
