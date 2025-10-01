@@ -196,6 +196,14 @@ all languages.
 * The [Amazon Kinesis Forum][kinesis-forum]
 
 ## Release Notes
+### Release 2.2.2 (October 1, 2025)
+* [#114](https://github.com/awslabs/amazon-kinesis-client-ruby/pull/114) Upgrade amazon-kinesis-client from 2.7.0 to 2.7.2
+* [#114](https://github.com/awslabs/amazon-kinesis-client-ruby/pull/114) Upgrade aws-sdk from 2.25.64 to 2.33.0
+* [#114](https://github.com/awslabs/amazon-kinesis-client-ruby/pull/114) Upgrade org.apache.commons:commons-lang3 from 3.14.0 to 3.18.0
+* [#114](https://github.com/awslabs/amazon-kinesis-client-ruby/pull/114) Upgrade netty.version from 4.1.125 to 4.2.4.Final
+* [#114](https://github.com/awslabs/amazon-kinesis-client-ruby/pull/114) Upgrade fasterxml-jackson from 2.13.15 to 2.15.0
+
+ 
 ### Release 2.2.1 (March 25, 2025)
 * Downgrade logback from 1.5.16 to 1.3.15 to maintain JDK 8 compatability
 
