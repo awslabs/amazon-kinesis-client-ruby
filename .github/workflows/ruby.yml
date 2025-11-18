@@ -8,14 +8,10 @@
 name: Sample Run Tests and Dependabot
 on:
   push:
-    branches: [ master ]
+    branches: [ master, '*-test' ]
   pull_request_target:
-    branches: [ master ]
-    types: [opened, synchronize, reopened, unlabeled]
-
-concurrency:
-  group: ruby.yml
-  cancel-in-progress: false
+    branches: [ master, '*-test' ]
+    types: [opened, synchronize]
 
 jobs:
   # Evaluates if the sample tests should run. If the workflow is triggered by a push OR
@@ -104,8 +100,8 @@ jobs:
       # Create unique identifiers for the stream name and application name
       - name: Set up unique identifiers
         run: |
-          STREAM_NAME="kclrbsample-${{ matrix.os }}-rb${{ matrix.ruby-version }}-jdk${{ matrix.jdk-version }}"
-          APP_NAME="RubyKCLSample-${{ matrix.os }}-rb${{ matrix.ruby-version }}-jdk${{ matrix.jdk-version }}"
+          STREAM_NAME="kclrbsample-${{ github.run_id }}-${{ matrix.os }}-rb${{ matrix.ruby-version }}-jdk${{ matrix.jdk-version }}"
+          APP_NAME="RubyKCLSample-${{ github.run_id }}-${{ matrix.os }}-rb${{ matrix.ruby-version }}-jdk${{ matrix.jdk-version }}"
           echo "STREAM_NAME=$STREAM_NAME" >> $GITHUB_ENV
           echo "APP_NAME=$APP_NAME" >> $GITHUB_ENV
 
@@ -143,6 +139,7 @@ jobs:
         env:
           RUNNER_OS: ${{ matrix.os }}
           STREAM_NAME: ${{ env.STREAM_NAME }}
+          RUN_TIME_SECONDS: 900
 
       # Check and verify results of KCL test
       - name: Verify KCL Functionality

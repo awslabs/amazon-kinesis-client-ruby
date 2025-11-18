@@ -2,16 +2,18 @@
 
 aws kinesis delete-stream --stream-name $STREAM_NAME || true
 
-## Reset the values of checkpoint, leaseCounter, ownerSwitchesSinceCheckpoint, and leaseOwner in DynamoDB table
-echo "Resetting DDB table"
-aws dynamodb update-item \
-  --table-name $APP_NAME \
-  --key '{"leaseKey": {"S": "shardId-000000000000"}}' \
-  --update-expression "SET checkpoint = :checkpoint, leaseCounter = :counter, ownerSwitchesSinceCheckpoint = :switches, leaseOwner = :owner" \
-  --expression-attribute-values '{
-    ":checkpoint": {"S": "TRIM_HORIZON"},
-    ":counter": {"N": "0"},
-    ":switches": {"N": "0"},
-    ":owner": {"S": "AVAILABLE"}
-  }' \
-  --return-values NONE
+# Delete all tables
+for i in {1..10}; do
+  echo "Deleting table $APP_NAME"
+  aws dynamodb delete-table --table-name $APP_NAME && break ||
+  echo "Table deletion failed, attempt $i/10. Retrying DynamoDB Table deletion in $((i * 3)) seconds" && sleep $((i * 3))
+done
+for SUFFIX in "-CoordinatorState" "-WorkerMetricStats"; do
+  if aws dynamodb describe-table --table-name $APP_NAME$SUFFIX &>/dev/null; then
+    echo "Deleting table $APP_NAME$SUFFIX"
+    for i in {1..10}; do
+      aws dynamodb delete-table --table-name $APP_NAME$SUFFIX && break ||
+      echo "Table deletion failed, attempt $i/10. Retrying DynamoDB Table deletion in $((i * 3))s" && sleep $((i * 3))
+    done
+  fi
+done
