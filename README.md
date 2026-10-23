@@ -207,7 +207,7 @@ all languages.
   * Upgrade io.opentelemetry:opentelemetry-api
   * Introduced opentelemetry.version 1.62.0
   * Introduced netty-reactive.version 2.0.6
-* [#125](https://github.com/awslabs/amazon-kinesis-client-ruby/pull/125) Bump ch.qos.logback:logback-core from 1.3.15 to 1.3.16
+* [#125](https://github.com/awslabs/amazon-kinesis-client-ruby/pull/125) Upgrade ch.qos.logback:logback-core from 1.3.15 to 1.3.16
 
 
 ### Release 3.1.1 (October 29, 2025)
