@@ -195,7 +195,7 @@ all languages.
 
 ## Release Notes
 ### Release (3.2.0 - October 23, 2026)
-* [#134](https://github.com/awslabs/amazon-kinesis-client-net/pull/134)
+* [#134](https://github.com/awslabs/amazon-kinesis-client-ruby/pull/134)
   * Upgrade amazon-kinesis-client from 3.1.3 to 3.5.3
   * Upgrade aws-sdk from 2.33.0 to 2.41.21
   * Upgrade dynamodb-lock-client from 1.3.0 to 1.4.0
