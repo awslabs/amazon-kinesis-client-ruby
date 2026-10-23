@@ -194,6 +194,22 @@ all languages.
 * The [Amazon Kinesis Forum][kinesis-forum]
 
 ## Release Notes
+### Release (3.2.0 - October 23, 2026)
+* [#134](https://github.com/awslabs/amazon-kinesis-client-ruby/pull/134)
+  * Upgrade amazon-kinesis-client from 3.1.3 to 3.5.3
+  * Upgrade aws-sdk from 2.33.0 to 2.41.21
+  * Upgrade dynamodb-lock-client from 1.3.0 to 1.4.0
+  * Upgrade reactive-streams from 1.0.3 to 1.0.4
+  * Upgrade rxjava from 3.1.8 to 3.1.11
+  * Upgrade schema-registry-serde from 1.1.19 to 1.1.27
+  * Upgrade com.fasterxml.jackson.core:jackson-core from 2.18.6 to 2.18.11
+  * Upgrade io.netty:netty-codec-http from 4.2.13.Final to 4.2.19.Final
+  * Upgrade io.opentelemetry:opentelemetry-api
+  * Introduced opentelemetry.version 1.62.0
+  * Introduced netty-reactive.version 2.0.6
+* [#125](https://github.com/awslabs/amazon-kinesis-client-ruby/pull/125) Upgrade ch.qos.logback:logback-core from 1.3.15 to 1.3.16
+
+
 ### Release 3.1.1 (October 29, 2025)
 * [#121](https://github.com/awslabs/amazon-kinesis-client-ruby/pull/121) Upgrade netty.version from 4.2.4.Final to 4.2.7.Final
 
